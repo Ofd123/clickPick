@@ -19,7 +19,15 @@
             android:exported="false" />
         <activity
             android:name=".screens.main_screen"
-            android:exported="false" />
+            android:exported="true" > <!-- tells the os to read the content of that file -->
+            <!-- will count the file as the main activity -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <activity
             android:name=".screens.saved_items_screen"
             android:exported="false" />
@@ -34,12 +42,7 @@
             android:exported="false" />
         <activity
             android:name=".MainActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            android:exported="false">
         </activity>
     </application>
 

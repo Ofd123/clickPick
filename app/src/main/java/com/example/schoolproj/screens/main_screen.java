@@ -22,17 +22,45 @@ import com.example.schoolproj.GeminiRelevant.GeminiCallback;
 import com.example.schoolproj.GeminiRelevant.GeminiManager;
 import com.example.schoolproj.MasterActivity;
 import com.example.schoolproj.R;
+import com.example.schoolproj.classes.User;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Dictionary;
 
 public class main_screen extends MasterActivity
 {
     GeminiManager geminiManager;
-
+    JSONObject searchDetails; //https://www.geeksforgeeks.org/java/working-with-json-data-in-java/
+    //https://www.w3schools.com/js/js_json_objects.asp
+    Intent signinIntent,loginIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_screen);
+        //check if the user singed in
+        //if not, signin/login
+
+        Boolean stayConnected = settings.getBoolean("stayConnected", false);
+        if(stayConnected)
+        {
+            connectedUser = new User(settings.getString("userID", ""), settings.getString("username", ""));
+            connectedUser.setLastLogin(settings.getLong("lastLogin", 0));
+            connectedUser.setCreationDate(settings.getLong("creationDate", 0));
+        }
+        else
+        {
+            signinIntent = new Intent(this, signUp_screen.class);
+            loginIntent = new Intent(this, login_screen.class);
+            startActivityForResult(signinIntent, Codes.SIGN_IN.ordinal());
+
+
+        }
+
     }
     // ---------------------------------------------------------------------------------------------
     public void regularSearch(View view)
@@ -107,7 +135,34 @@ public class main_screen extends MasterActivity
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
-
+        // ------------------------------------------------------------------------
+        // check if sign in result
+        if(resultCode == RESULT_OK && requestCode == Codes.SIGN_IN.ordinal())
+        {
+            if (data != null && data.getExtras() != null)
+            {
+                int state = data.getIntExtra("state", Codes.ERROR.ordinal());
+                if (state == Codes.LOG_IN.ordinal())
+                {
+                    startActivityForResult(loginIntent, Codes.LOG_IN.ordinal());
+                }
+            }
+            return;
+        }
+        // ------------------------------------------------------------------------
+        if(resultCode == RESULT_OK && requestCode == Codes.LOG_IN.ordinal())
+        {
+            if (data != null && data.getExtras() != null)
+            {
+                int state = data.getIntExtra("state", Codes.ERROR.ordinal());
+                if (state == Codes.SIGN_IN.ordinal())
+                {
+                    startActivityForResult(signinIntent, Codes.SIGN_IN.ordinal());
+                }
+            }
+            return;
+        }
+        // ------------------------------------------------------------------------
         Bitmap imageBitmap = null;
         // check camera result
         if (resultCode == RESULT_OK && requestCode == Codes.CAMERA_REQUEST_CODE.ordinal())
@@ -123,8 +178,9 @@ public class main_screen extends MasterActivity
                 return;
             }
         }
+        // ------------------------------------------------------------------------
         // check gallery result
-        // i did not combine it with the camerra because i might implement the ability to share several images from the gallery while you can only take 1 picture from the camera at a time
+        // i did not combine it with the camera because i might implement the ability to share several images from the gallery while you can only take 1 picture from the camera at a time
         else if (requestCode == Codes.GALLERY_REQUEST_CODE.ordinal() && resultCode == RESULT_OK && data != null)
         {
             if (data != null && data.getExtras() != null)
@@ -141,8 +197,8 @@ public class main_screen extends MasterActivity
         {
             Toast.makeText(this, "No Image Selected", Toast.LENGTH_SHORT).show();
         }
-
-        // analyze with gemini
+        // ------------------------------------------------------------------------
+        // analyze picture with gemini
         if (imageBitmap != null)
         {
             ProgressDialog pd = new ProgressDialog(this);
@@ -155,10 +211,21 @@ public class main_screen extends MasterActivity
                 public void onSuccess(String result)
                 {
                     pd.dismiss();
+                    try
+                    {
+                        searchDetails = new JSONObject(result);
+                        Intent intent = new Intent(main_screen.this, search_screen.class);
+                        intent.putExtra("searchDetails", searchDetails.toString());
+                        startActivity(intent);
+                    }
+                    catch (JSONException e)
+                    {
+                        Toast.makeText(main_screen.this, "JSON Error: "+e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
                 }
-
                 @Override
-                public void onFailure(Throwable error) {
+                public void onFailure(Throwable error)
+                {
                     pd.dismiss();
                     Log.e(TAG, "onActivityResult/Error: " + error.getMessage());
                 }
@@ -171,10 +238,9 @@ public class main_screen extends MasterActivity
         }
     }
     // ---------------------------------------------------------------------------------------------
-
-
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
+    {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode == Codes.CAMERA_PERMISSION_CODE.ordinal())
@@ -189,16 +255,19 @@ public class main_screen extends MasterActivity
             }
         }
     }
-
+    // ---------------------------------------------------------------------------------------------
 
     public void searchHistory(View view) {
     }
+    // ---------------------------------------------------------------------------------------------
 
     public void favorites(View view) {
     }
+    // ---------------------------------------------------------------------------------------------
 
     public void allHistory(View view) {
     }
+    // ---------------------------------------------------------------------------------------------
 
     public void goToSettings(View view) {
     }

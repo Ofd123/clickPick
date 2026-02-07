@@ -23,7 +23,8 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import com.google.firebase.auth.FirebaseUser;
 
-public class login_screen extends MasterActivity {
+public class login_screen extends MasterActivity
+{
 
     Intent loginIntent;
     String userName, password;
@@ -69,63 +70,55 @@ public class login_screen extends MasterActivity {
                         if (task.isSuccessful())
                         {
                             // Firebase login was successful
-                            Log.d("LOGIN_SUCCESS", "signInWithEmail:success");
+                            Log.d("LOGIN_SUCCESS", "logInWithEmail:success");
                             FirebaseUser fbUser = refAuth.getCurrentUser();
-                            onLoginSuccess(fbUser);
+
+                            if (rememberMeCB.isChecked())
+                            {
+                                SharedPreferences.Editor editor = settings.edit();
+                                editor.putBoolean("stayConnected", true);
+                                editor.putString("userID", fbUser.getUid());
+
+                                String username = fbUser.getEmail() != null ? fbUser.getEmail().split("@")[0] : "User";
+                                editor.putString("username", username);
+                                editor.putLong("lastLogin", System.currentTimeMillis());
+                                editor.apply();
+                            }
+
+                            Intent resultIntent = new Intent();
+                            resultIntent.putExtra("state", Codes.REMEMBER_ME.ordinal());
+                            setResult(Activity.RESULT_OK, resultIntent);
+                            finish();
                         }
                         else
                         {
                             // Firebase login failed, show a specific error message
-                            Log.w("LOGIN_FAILURE", "signInWithEmail:failure", task.getException());
-                            handleLoginFailure(task.getException());
+                            Log.w("LOGIN_FAILURE", "logInWithEmail:failure", task.getException());
+                            String errorMessage;
+                            Exception exp = task.getException();
+                            if (exp instanceof FirebaseAuthInvalidUserException)
+                            {
+                                errorMessage = "No account found with this email.";
+                            }
+                            else if (exp instanceof FirebaseAuthInvalidCredentialsException)
+                            {
+                                errorMessage = "Incorrect password. Please try again.";
+                            }
+                            else if (exp instanceof FirebaseNetworkException)
+                            {
+                                errorMessage = "Cannot connect to the network. Please check your connection.";
+                            }
+                            else
+                            {
+                                errorMessage = "Authentication failed. Please try again later.";
+                            }
+                            Toast.makeText(login_screen.this, errorMessage, Toast.LENGTH_LONG).show();
                         }
                     }
                 });
     }
-    private void onLoginSuccess(FirebaseUser fbUser) {
-
-        if (rememberMeCB.isChecked())
-        {
-            SharedPreferences.Editor editor = settings.edit();
-            editor.putBoolean("stayConnected", true);
-            editor.putString("userID", fbUser.getUid());
-
-            String username = fbUser.getEmail() != null ? fbUser.getEmail().split("@")[0] : "User";
-            editor.putString("username", username);
-            editor.putLong("lastLogin", System.currentTimeMillis());
-            editor.apply();
-        }
-
-        Intent resultIntent = new Intent();
-        resultIntent.putExtra("state", Codes.REMEMBER_ME.ordinal());
-        setResult(Activity.RESULT_OK, resultIntent);
-        finish();
-    }
-
-    private void handleLoginFailure(Exception exception)
+    public void switchToSignUp(View view)
     {
-        String errorMessage;
-        if (exception instanceof FirebaseAuthInvalidUserException)
-        {
-            errorMessage = "No account found with this email.";
-        }
-        else if (exception instanceof FirebaseAuthInvalidCredentialsException)
-        {
-            errorMessage = "Incorrect password. Please try again.";
-        }
-        else if (exception instanceof FirebaseNetworkException)
-        {
-            errorMessage = "Cannot connect to the network. Please check your connection.";
-        }
-        else
-        {
-            errorMessage = "Authentication failed. Please try again later.";
-        }
-        Toast.makeText(login_screen.this, errorMessage, Toast.LENGTH_LONG).show();
-    }
-
-
-    public void signUp(View view) {
         Intent resultIntent = new Intent();
         resultIntent.putExtra("state", Codes.SIGN_IN.ordinal());
         setResult(Activity.RESULT_OK, resultIntent);

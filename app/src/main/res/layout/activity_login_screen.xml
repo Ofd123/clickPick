@@ -149,7 +149,7 @@
             android:layout_weight="1"
             android:background="@color/white"
             android:gravity="top|left"
-            android:onClick="logIn"
+            android:onClick="switchToSignUp"
             android:text="don't have an account?"
             android:textColor="#2196F3" />
 
@@ -176,12 +176,12 @@
             android:layout_weight="1" />
 
         <Button
-            android:id="@+id/signUpBtn"
+            android:id="@+id/logInBtn"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:onClick="signUp"
-            android:text="sign up" />
+            android:onClick="logIn"
+            android:text="log in" />
 
         <Space
             android:layout_width="wrap_content"

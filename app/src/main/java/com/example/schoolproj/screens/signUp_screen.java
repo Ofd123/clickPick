@@ -28,7 +28,8 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
 
-public class signUp_screen extends MasterActivity {
+public class signUp_screen extends MasterActivity
+{
     EditText nameED, emailED, passwordED;
     String userName, email, password;
     CheckBox rememberMeCB, termsOfSrviceCB;
@@ -45,77 +46,87 @@ public class signUp_screen extends MasterActivity {
         passwordED = findViewById(R.id.passwordED);
     }
 
-    public Boolean connect() {
+    public void connect()
+    {
         ProgressDialog progressDialog = new ProgressDialog(signUp_screen.this);
         progressDialog.setTitle("creating user");
         progressDialog.setMessage("please wait...");
         progressDialog.show();
-        final Boolean[] success = {false};
         refAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
+            public void onComplete(@NonNull Task<AuthResult> task)
+            {
                 progressDialog.dismiss();
-                if (task.isSuccessful()) {
-                    Log.i("MainActivity", "createUserWithEmailAndPassword:success");
+                if (task.isSuccessful())
+                {
+                    Log.i("SIGNUP_SUCCESS", "createUserWithEmailAndPassword:success");
                     FirebaseUser user = refAuth.getCurrentUser();
                     connectedUser = new User(user.getUid(), userName);
                     Toast.makeText(signUp_screen.this, "User created successfully.", Toast.LENGTH_SHORT).show();
-                    success[0] = true;
-                } else {
-                    Exception exp = task.getException();
-                    if (exp instanceof FirebaseAuthInvalidUserException) {
-                        Toast.makeText(signUp_screen.this, "Invalid email address.", Toast.LENGTH_SHORT).show();
-                    } else if (exp instanceof FirebaseAuthWeakPasswordException) {
-                        Toast.makeText(signUp_screen.this, "Password is too weak", Toast.LENGTH_SHORT).show();
-                    } else if (exp instanceof FirebaseAuthUserCollisionException) {
-                        Toast.makeText(signUp_screen.this, "User already exists.", Toast.LENGTH_SHORT).show();
 
-                    } else if (exp instanceof FirebaseAuthInvalidCredentialsException) {
+                    if (rememberMeCB.isChecked())
+                    {
+                        SharedPreferences.Editor editor = settings.edit();
+                        editor.putBoolean("rememberMe", rememberMeCB.isChecked());
+                        editor.putString("userID", connectedUser.getUserID());
+                        editor.putString("username", connectedUser.getUsername());
+                        editor.putLong("lastLogin", connectedUser.getLastLogin());
+                        editor.putLong("creationDate", connectedUser.getCreationDate());
+                        editor.apply();
+                    }
+
+                    Intent resultIntent = new Intent();
+                    resultIntent.putExtra("state", Codes.REMEMBER_ME.ordinal());
+                    setResult(Activity.RESULT_OK, resultIntent);
+                    finish();
+                }
+                else
+                {
+                    Log.w("SIGNUP_FAILURE", "signIn:failure", task.getException());
+                    Exception exp = task.getException();
+                    if (exp instanceof FirebaseAuthInvalidUserException)
+                    {
+                        Toast.makeText(signUp_screen.this, "Invalid email address.", Toast.LENGTH_SHORT).show();
+                    }
+                    else if (exp instanceof FirebaseAuthWeakPasswordException)
+                    {
+                        Toast.makeText(signUp_screen.this, "Password is too weak", Toast.LENGTH_SHORT).show();
+                    }
+                    else if (exp instanceof FirebaseAuthUserCollisionException)
+                    {
+                        Toast.makeText(signUp_screen.this, "User already exists.", Toast.LENGTH_SHORT).show();
+                    }
+                    else if (exp instanceof FirebaseAuthInvalidCredentialsException)
+                    {
                         Toast.makeText(signUp_screen.this, "General authentication failure.", Toast.LENGTH_SHORT).show();
-                    } else if (exp instanceof FirebaseNetworkException) {
+                    }
+                    else if (exp instanceof FirebaseNetworkException)
+                    {
                         Toast.makeText(signUp_screen.this, "Network error. Please check your connection.", Toast.LENGTH_SHORT).show();
-                    } else {
+                    }
+                    else
+                    {
                         Toast.makeText(signUp_screen.this, "An error occurred. Please try again later.", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
         });
 
-        if (success[0]) {
-            return true;
-        } else {
-            return false;
-        }
     }
 
-    public void signUp(View view) {
+    public void signUp(View view)
+    {
         if (termsOfSrviceCB.isChecked())
         {
             userName = nameED.getText().toString();
             email = emailED.getText().toString();
             password = passwordED.getText().toString();
-            if (userName.isEmpty() || email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "please fill all the fields", Toast.LENGTH_SHORT).show();
-            }
-            if (connect())
+            if (userName.isEmpty() || email.isEmpty() || password.isEmpty())
             {
-                if (rememberMeCB.isChecked())
-                {
-                    SharedPreferences.Editor editor = settings.edit();
-                    editor.putBoolean("rememberMe", rememberMeCB.isChecked());
-                    editor.putString("userID", connectedUser.getUserID());
-                    editor.putString("username", connectedUser.getUsername());
-                    editor.putLong("lastLogin", connectedUser.getLastLogin());
-                    editor.putLong("creationDate", connectedUser.getCreationDate());
-                    editor.apply();
-                }
-
-                Intent resultIntent = new Intent();
-                resultIntent.putExtra("state", Codes.REMEMBER_ME.ordinal());
-                setResult(Activity.RESULT_OK, resultIntent);
-                finish();
-
+                Toast.makeText(this, "please fill all the fields", Toast.LENGTH_SHORT).show();
+                return;
             }
+            connect();
         }
 
     }
