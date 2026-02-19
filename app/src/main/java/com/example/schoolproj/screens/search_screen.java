@@ -23,25 +23,20 @@ public class search_screen extends AppCompatActivity
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_screen);
-
-        Intent dataSent = getIntent();
         //TODO:  work on GUI
         recyclerView = findViewById(R.id.rvListItems);
         recyclerView.setHasFixedSize(true);
-
-
-        searchParameters = (List<SearchItemParameter>) intent.getSerializableExtra("item details");
-        adapter.setParameters(searchParameters);
-
-        adapter = new RecycleViewAdapter(/*this,*/ searchParameters);
-        recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        Intent dataSent = getIntent();
+        searchParameters = (List<SearchItemParameter>) dataSent.getSerializableExtra("item details");
 
-
+        adapter = new RecycleViewAdapter(searchParameters); //initialize the adapter
+        recyclerView.setAdapter(adapter); //set the adapter to the recycle view
     }
     void searchWithGemini()
     {
@@ -55,8 +50,19 @@ public class search_screen extends AppCompatActivity
     {
 
     }
+    public void addItem(View view)
+    {
+        SearchItemParameter newItem = new SearchItemParameter("", "", true);
+        searchParameters.add(newItem);
+        adapter.notifyItemInserted(searchParameters.size() - 1);
+        recyclerView.scrollToPosition(searchParameters.size() - 1);
+    }
 
-    public void search(View view)
+    public void back(View view)
+    {
+        finish();
+    }
+    public void searchBtn(View view)
     {
         //TODO: search the item on the webb and then move it to the result screen
         try
@@ -67,12 +73,5 @@ public class search_screen extends AppCompatActivity
         {
             manualSearch();
         }
-    }
-
-    public void addItem(View view)
-    {
-        //first i will try changing the textView to edit text, if it works then i will keep it that way
-        //if not, then i will implement a new .xml file and adapter -> 1 for fixed lists and 1 for dynamic lists (custom)
-
     }
 }

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp"
+    android:orientation="vertical">
+
+    <EditText
+        android:id="@+id/itemAttributeED"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="enter attribute"
+        android:inputType="text"
+        android:enabled="false"
+        tools:ignore="TouchTargetSizeCheck" />
+
+    <EditText
+        android:id="@+id/itemSettingED"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:hint = "enter settings"
+        tools:ignore="TouchTargetSizeCheck"
+        />
+
+</LinearLayout>

@@ -1,6 +1,5 @@
 package com.example.schoolproj;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,36 +18,35 @@ import java.util.Objects;
 
 public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.ViewHolder>
 {
-//    Context context;
+    static final int FIXED_TYPE = 0;
+    static final int EDITABLE_TYPE = 1;
     private List<SearchItemParameter> parameters;
-    public RecycleViewAdapter(/*Context context,*/ List<SearchItemParameter> parameters)
+
+    public RecycleViewAdapter(List<SearchItemParameter> parameters)
     {
-//        this.context = context;
         this.parameters = parameters;
     }
-
     public List<SearchItemParameter> getParameters()
     {
         return parameters;
     }
-
     public void setParameters(List<SearchItemParameter> parameters)
     {
         this.parameters = parameters;
     }
-
     public RecycleViewAdapter(@NonNull View itemView)
     {
         super();
 
     }
 //  ------------------------------------------------------------
+
     // handles the new gui while scrolling
     @NonNull
     @Override
     public RecycleViewAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
     {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_in_search_items, Objects.requireNonNull(parent), false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.change_item_settings_in_search_items, Objects.requireNonNull(parent), false);
         return new ViewHolder(view);
     }
 
@@ -57,9 +55,17 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.
     public void onBindViewHolder(@NonNull RecycleViewAdapter.ViewHolder holder, int position)
     {
         SearchItemParameter parameter = parameters.get(position);
-
-        holder.itemDescTV.setText(parameter.getAttribute());
-        holder.itemDetailsED.setText(parameter.getSetting());
+        if(parameter.getEditable())
+        {
+            holder.itemDetailsED.setEnabled(true);
+            holder.itemDetailsED.setHint(parameter.getSetting());
+            holder.itemDescTV.setHint(parameter.getAttribute());
+        }
+        else
+        {
+            holder.itemDescTV.setText(parameter.getAttribute());
+            holder.itemDetailsED.setText(parameter.getSetting());
+        }
     }
 
     @Override
@@ -67,7 +73,7 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.
     {
         return parameters.toArray().length;
     }
-//  ------------------------------------------------------------
+    //  ------------------------------------------------------------
     public class ViewHolder extends RecyclerView.ViewHolder
     {
         private TextView itemDescTV;
@@ -76,10 +82,8 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.
         public ViewHolder(@NonNull View itemView)
         {
             super(itemView);
-
-            itemDescTV = itemView.findViewById(R.id.itemDesc);
-            itemDetailsED = itemView.findViewById(R.id.itemDetails);
-
+            itemDescED = itemView.findViewById(R.id.itemAttributeED);
+            itemDetailsED = itemView.findViewById(R.id.itemSetting);
         }
     }
 }
