@@ -30,7 +30,7 @@ public class MasterActivity extends AppCompatActivity
 
     }
     protected SharedPreferences settings;
-    protected User connectedUser;
+    protected User connected_user;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {

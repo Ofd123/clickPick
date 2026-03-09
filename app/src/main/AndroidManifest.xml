@@ -12,6 +12,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SchoolProj">
         <activity
+            android:name=".screens.product_details_screen"
+            android:exported="false" />
+        <activity
+            android:name=".screens.search_result_screen"
+            android:exported="false" />
+        <activity
+            android:name=".screens.search_results_screan"
+            android:exported="false" />
+        <activity
             android:name=".search_results_screen"
             android:exported="false" />
         <activity
@@ -19,7 +28,7 @@
             android:exported="false" />
         <activity
             android:name=".screens.main_screen"
-            android:exported="true" > <!-- tells the os to read the content of that file -->
+            android:exported="true"> <!-- tells the os to read the content of that file -->
             <!-- will count the file as the main activity -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,7 +36,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".screens.saved_items_screen"
             android:exported="false" />
@@ -42,8 +50,7 @@
             android:exported="false" />
         <activity
             android:name=".MainActivity"
-            android:exported="false">
-        </activity>
+            android:exported="false" />
     </application>
 
 </manifest>

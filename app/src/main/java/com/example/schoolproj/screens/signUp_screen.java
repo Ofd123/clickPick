@@ -61,17 +61,17 @@ public class signUp_screen extends MasterActivity
                 {
                     Log.i("SIGNUP_SUCCESS", "createUserWithEmailAndPassword:success");
                     FirebaseUser user = refAuth.getCurrentUser();
-                    connectedUser = new User(user.getUid(), userName);
+                    connected_user = new User(user.getUid(), userName);
                     Toast.makeText(signUp_screen.this, "User created successfully.", Toast.LENGTH_SHORT).show();
 
                     if (rememberMeCB.isChecked())
                     {
                         SharedPreferences.Editor editor = settings.edit();
                         editor.putBoolean("rememberMe", rememberMeCB.isChecked());
-                        editor.putString("userID", connectedUser.getUserID());
-                        editor.putString("username", connectedUser.getUsername());
-                        editor.putLong("lastLogin", connectedUser.getLastLogin());
-                        editor.putLong("creationDate", connectedUser.getCreationDate());
+                        editor.putString("userID", connected_user.getUserID());
+                        editor.putString("username", connected_user.getUsername());
+                        editor.putLong("lastLogin", connected_user.getLastLogin());
+                        editor.putLong("creationDate", connected_user.getCreationDate());
                         editor.apply();
                     }
 

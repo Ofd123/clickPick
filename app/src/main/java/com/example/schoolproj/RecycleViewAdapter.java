@@ -22,6 +22,7 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.
     static final int EDITABLE_TYPE = 1;
     private List<SearchItemParameter> parameters;
 
+
     public RecycleViewAdapter(List<SearchItemParameter> parameters)
     {
         this.parameters = parameters;

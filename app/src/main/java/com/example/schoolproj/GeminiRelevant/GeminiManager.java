@@ -77,6 +77,31 @@ public class GeminiManager
             }
         });
     }
+    public void sendTextPrompt(String prompt, GeminiCallback callback)
+    {
+        gemini.generateContent(prompt, new Continuation<GenerateContentResponse>() {
+            @NonNull
+            @Override
+            public CoroutineContext getContext()
+            {
+                return EmptyCoroutineContext.INSTANCE;
+            }
+
+            @Override
+            public void resumeWith(@NonNull Object result)
+            {
+                if(result instanceof Result.Failure)
+                {
+                    Log.i(TAG, "Error: " + ((Result.Failure) result).exception.getMessage());
+                    callback.onFailure(((Result.Failure) result).exception);
+                }
+                else
+                {
+                    callback.onSuccess(((GenerateContentResponse) result).getText());
+                }
+            }
+        });
+    }
 }
 
 

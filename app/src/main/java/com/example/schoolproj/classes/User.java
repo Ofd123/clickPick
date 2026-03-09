@@ -13,6 +13,13 @@ public class User {
     public User()
     {
     }
+    public User(String username)
+    {
+        this.username = username;
+        // 2. Set current local time in milliseconds
+        this.creationDate = System.currentTimeMillis();
+        this.lastLogin = System.currentTimeMillis();
+    }
 
     public User(String userID, String username) {
         this.userID = userID;

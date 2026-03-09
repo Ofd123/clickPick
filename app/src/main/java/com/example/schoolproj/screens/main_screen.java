@@ -3,12 +3,10 @@ package com.example.schoolproj.screens;
 import static android.content.ContentValues.TAG;
 import static com.example.schoolproj.GeminiRelevant.Prompts.GET_DATA_FROM_IMAGE;
 
-import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -24,11 +22,8 @@ import com.example.schoolproj.MasterActivity;
 import com.example.schoolproj.R;
 import com.example.schoolproj.classes.User;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.Dictionary;
 
 public class main_screen extends MasterActivity
 {
@@ -48,9 +43,9 @@ public class main_screen extends MasterActivity
         Boolean stayConnected = settings.getBoolean("stayConnected", false);
         if(stayConnected)
         {
-            connectedUser = new User(settings.getString("userID", ""), settings.getString("username", ""));
-            connectedUser.setLastLogin(settings.getLong("lastLogin", 0));
-            connectedUser.setCreationDate(settings.getLong("creationDate", 0));
+            connected_user = new User(settings.getString("userID", ""), settings.getString("username", ""));
+            connected_user.setLastLogin(settings.getLong("lastLogin", 0));
+            connected_user.setCreationDate(settings.getLong("creationDate", 0));
         }
         else
         {
@@ -257,7 +252,10 @@ public class main_screen extends MasterActivity
     }
     // ---------------------------------------------------------------------------------------------
 
-    public void searchHistory(View view) {
+    public void searchHistory(View view)
+    {
+        Intent intent = new Intent(this, search_history_screen.class);
+        startActivity(intent);
     }
     // ---------------------------------------------------------------------------------------------
 

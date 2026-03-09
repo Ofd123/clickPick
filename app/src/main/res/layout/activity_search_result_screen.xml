@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".screens.saved_items_screen">
+    android:padding="16dp"
+    tools:context=".screens.search_result_screen">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -50,7 +51,7 @@
             android:layout_weight="1" />
 
         <ListView
-            android:id="@+id/savedItems"
+            android:id="@+id/results"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
