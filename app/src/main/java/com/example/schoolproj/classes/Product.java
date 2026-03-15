@@ -1,8 +1,8 @@
 package com.example.schoolproj.classes;
 
-import android.graphics.Bitmap;
+import java.io.Serializable;
 
-public class Product
+public class Product implements Serializable
 {
     String product_id;
     String product_name;

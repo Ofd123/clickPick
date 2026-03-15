@@ -67,7 +67,7 @@ public class signUp_screen extends MasterActivity
                     if (rememberMeCB.isChecked())
                     {
                         SharedPreferences.Editor editor = settings.edit();
-                        editor.putBoolean("rememberMe", rememberMeCB.isChecked());
+                        editor.putBoolean("stayConnected", true);
                         editor.putString("userID", connected_user.getUserID());
                         editor.putString("username", connected_user.getUsername());
                         editor.putLong("lastLogin", connected_user.getLastLogin());

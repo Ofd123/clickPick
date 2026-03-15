@@ -28,35 +28,45 @@ import org.json.JSONObject;
 public class main_screen extends MasterActivity
 {
     GeminiManager geminiManager;
-    JSONObject searchDetails; //https://www.geeksforgeeks.org/java/working-with-json-data-in-java/
-    //https://www.w3schools.com/js/js_json_objects.asp
-    Intent signinIntent,loginIntent;
+    JSONObject searchDetails;
+    Intent signinIntent, loginIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_screen);
-        //check if the user singed in
-        //if not, signin/login
+        
+        // Initialize GeminiManager
+        geminiManager = GeminiManager.getInstance();
 
-        Boolean stayConnected = settings.getBoolean("stayConnected", false);
-        if(stayConnected)
-        {
-            connected_user = new User(settings.getString("userID", ""), settings.getString("username", ""));
-            connected_user.setLastLogin(settings.getLong("lastLogin", 0));
-            connected_user.setCreationDate(settings.getLong("creationDate", 0));
-        }
-        else
+        if (!loadUserData())
         {
             signinIntent = new Intent(this, signUp_screen.class);
             loginIntent = new Intent(this, login_screen.class);
             startActivityForResult(signinIntent, Codes.SIGN_IN.ordinal());
-
-
         }
-
     }
+
+    /**
+     * Loads user data from SharedPreferences.
+     * @return true if user is connected, false otherwise.
+     */
+    private boolean loadUserData()
+    {
+        boolean stayConnected = settings.getBoolean("stayConnected", false);
+        if (stayConnected)
+        {
+            String userID = settings.getString("userID", "");
+            String username = settings.getString("username", "User");
+            connected_user = new User(userID, username);
+            connected_user.setLastLogin(settings.getLong("lastLogin", System.currentTimeMillis()));
+            connected_user.setCreationDate(settings.getLong("creationDate", 0));
+            return true;
+        }
+        return false;
+    }
+
     // ---------------------------------------------------------------------------------------------
     public void regularSearch(View view)
     {
@@ -77,25 +87,23 @@ public class main_screen extends MasterActivity
                 {
                     case 0:
                         openCamera();
-                        dialog.dismiss(); // might switch to cancel
+                        dialog.dismiss();
+                        break;
                     case 1:
                         openGallery();
                         dialog.dismiss();
+                        break;
                 }
             });
 
-            // handle canceling the dialog
             builder.setOnCancelListener(dialog -> {
                 Toast.makeText(main_screen.this, "Image selection cancelled.", Toast.LENGTH_SHORT).show();
-                throw new RuntimeException("Image selection cancelled.");
             });
             builder.create().show();
-
-
         }
         catch (Exception e)
         {
-            Log.i("status:", e.toString());
+            Log.e(TAG, "imageSearch error: " + e.getMessage());
         }
     }
     // ---------------------------------------------------------------------------------------------
@@ -121,8 +129,7 @@ public class main_screen extends MasterActivity
         }
         catch (Exception e)
         {
-            e.printStackTrace();
-            Log.i("Error", e.toString());
+            Log.e("Error", e.toString());
         }
     }
     // ---------------------------------------------------------------------------------------------
@@ -130,77 +137,63 @@ public class main_screen extends MasterActivity
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
-        // ------------------------------------------------------------------------
-        // check if sign in result
-        if(resultCode == RESULT_OK && requestCode == Codes.SIGN_IN.ordinal())
+
+        if (resultCode == RESULT_OK)
         {
-            if (data != null && data.getExtras() != null)
+            // Handle Login/Signup flow
+            if (requestCode == Codes.SIGN_IN.ordinal() || requestCode == Codes.LOG_IN.ordinal())
             {
-                int state = data.getIntExtra("state", Codes.ERROR.ordinal());
+                int state = data != null ? data.getIntExtra("state", Codes.ERROR.ordinal()) : Codes.ERROR.ordinal();
+
                 if (state == Codes.LOG_IN.ordinal())
                 {
                     startActivityForResult(loginIntent, Codes.LOG_IN.ordinal());
                 }
-            }
-            return;
-        }
-        // ------------------------------------------------------------------------
-        if(resultCode == RESULT_OK && requestCode == Codes.LOG_IN.ordinal())
-        {
-            if (data != null && data.getExtras() != null)
-            {
-                int state = data.getIntExtra("state", Codes.ERROR.ordinal());
-                if (state == Codes.SIGN_IN.ordinal())
+                else if (state == Codes.SIGN_IN.ordinal())
                 {
                     startActivityForResult(signinIntent, Codes.SIGN_IN.ordinal());
                 }
-            }
-            return;
-        }
-        // ------------------------------------------------------------------------
-        Bitmap imageBitmap = null;
-        // check camera result
-        if (resultCode == RESULT_OK && requestCode == Codes.CAMERA_REQUEST_CODE.ordinal())
-        {
-            if (data != null && data.getExtras() != null)
-            {
-                imageBitmap = (Bitmap) data.getExtras().get("data");
-            }
-            else
-            {
-                Toast.makeText(this, "No picture was sent.", Toast.LENGTH_SHORT).show();
-                Log.e(TAG, "Image bitmap is null");
+                else if (state == Codes.REMEMBER_ME.ordinal())
+                {
+                    loadUserData(); // Refresh user from SharedPreferences
+                    Toast.makeText(this, "Welcome " + (connected_user != null ? connected_user.getUsername() : ""), Toast.LENGTH_SHORT).show();
+                }
                 return;
             }
-        }
-        // ------------------------------------------------------------------------
-        // check gallery result
-        // i did not combine it with the camera because i might implement the ability to share several images from the gallery while you can only take 1 picture from the camera at a time
-        else if (requestCode == Codes.GALLERY_REQUEST_CODE.ordinal() && resultCode == RESULT_OK && data != null)
-        {
-            if (data != null && data.getExtras() != null)
-            {
-                imageBitmap = (Bitmap) data.getExtras().get("data");
-            }
-            else
-            {
-                Toast.makeText(this, "No image captured.", Toast.LENGTH_SHORT).show();
-                return;
-            }
-        }
-        else
-        {
-            Toast.makeText(this, "No Image Selected", Toast.LENGTH_SHORT).show();
-        }
-        // ------------------------------------------------------------------------
-        // analyze picture with gemini
-        if (imageBitmap != null)
-        {
-            ProgressDialog pd = new ProgressDialog(this);
-            pd.setTitle("Analyzing Image...");
-            pd.show();
 
-            String prompt = GET_DATA_FROM_IMAGE;
+            // Handle Camera/Gallery results
+            Bitmap imageBitmap = null;
+            if (requestCode == Codes.CAMERA_REQUEST_CODE.ordinal())
+            {
+                if (data != null && data.getExtras() != null)
+                {
+                    imageBitmap = (Bitmap) data.getExtras().get("data");
+                }
+            }
+            else if (requestCode == Codes.GALLERY_REQUEST_CODE.ordinal())
+            {
+                 // Note: Gallery usually returns a Uri, but following existing logic style
+                 if (data != null && data.getExtras() != null)
+                 {
+                     imageBitmap = (Bitmap) data.getExtras().get("data");
+                 }
+            }
+
+            if (imageBitmap != null)
+            {
+                analyzeImage(imageBitmap);
+            }
+        }
+    }
+
+    private void analyzeImage(Bitmap imageBitmap)
+    {
+        ProgressDialog pd = new ProgressDialog(this);
+        pd.setTitle("Analyzing Image...");
+        pd.show();
+
+        String prompt = GET_DATA_FROM_IMAGE;
+        if (geminiManager != null) {
             geminiManager.sendTextWithPhotoPrompt(prompt, imageBitmap, new GeminiCallback() {
                 @Override
                 public void onSuccess(String result)
@@ -222,22 +215,19 @@ public class main_screen extends MasterActivity
                 public void onFailure(Throwable error)
                 {
                     pd.dismiss();
-                    Log.e(TAG, "onActivityResult/Error: " + error.getMessage());
+                    Log.e(TAG, "analyzeImage failure: " + error.getMessage());
                 }
             });
-        }
-        else
-        {
-            Toast.makeText(this, "No picture was sent.", Toast.LENGTH_SHORT).show();
-            Log.e(TAG, "Intent data or extras are null");
+        } else {
+            pd.dismiss();
+            Toast.makeText(this, "Gemini Manager not initialized", Toast.LENGTH_SHORT).show();
         }
     }
-    // ---------------------------------------------------------------------------------------------
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
     {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
         if (requestCode == Codes.CAMERA_PERMISSION_CODE.ordinal())
         {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
@@ -250,23 +240,14 @@ public class main_screen extends MasterActivity
             }
         }
     }
-    // ---------------------------------------------------------------------------------------------
 
     public void searchHistory(View view)
     {
         Intent intent = new Intent(this, search_history_screen.class);
         startActivity(intent);
     }
-    // ---------------------------------------------------------------------------------------------
 
-    public void favorites(View view) {
-    }
-    // ---------------------------------------------------------------------------------------------
-
-    public void allHistory(View view) {
-    }
-    // ---------------------------------------------------------------------------------------------
-
-    public void goToSettings(View view) {
-    }
+    public void favorites(View view) {}
+    public void allHistory(View view) {}
+    public void goToSettings(View view) {}
 }

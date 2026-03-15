@@ -1,6 +1,9 @@
 package com.example.schoolproj.classes;
 
-public class SearchItemParameter
+import androidx.annotation.NonNull;
+import java.io.Serializable;
+
+public class SearchItemParameter implements Serializable
 {
     String Attribute , setting;
     Boolean isEditable;
@@ -46,5 +49,11 @@ public class SearchItemParameter
 
     public void setSetting(String setting) {
         this.setting = setting;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return Attribute + ": " + setting;
     }
 }

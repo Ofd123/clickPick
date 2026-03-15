@@ -82,6 +82,9 @@ public class login_screen extends MasterActivity
                                 String username = fbUser.getEmail() != null ? fbUser.getEmail().split("@")[0] : "User";
                                 editor.putString("username", username);
                                 editor.putLong("lastLogin", System.currentTimeMillis());
+                                if (fbUser.getMetadata() != null) {
+                                    editor.putLong("creationDate", fbUser.getMetadata().getCreationTimestamp());
+                                }
                                 editor.apply();
                             }
 
