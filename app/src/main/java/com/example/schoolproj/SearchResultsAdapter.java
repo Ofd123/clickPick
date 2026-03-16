@@ -8,19 +8,21 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 public class SearchResultsAdapter extends BaseAdapter
 {
     private Context context;
-    private int images[];
+    private String images_url[];
     private String names[];
     private String prices[];
     private String companies[];
     private LayoutInflater inflater;
 
-    public SearchResultsAdapter(Context context, int images[], String names[], String prices[], String companies[])
+    public SearchResultsAdapter(Context context, String images[], String names[], String prices[], String companies[])
     {
         this.context = context;
-        this.images = images;
+        this.images_url = images;
         this.names = names;
         this.prices = prices;
         this.companies = companies;
@@ -57,7 +59,8 @@ public class SearchResultsAdapter extends BaseAdapter
         p_name.setText(names[i]);
         p_price.setText(prices[i]);
         p_company.setText(companies[i]);
-        img.setImageResource(images[i]);
+        Picasso.get().load(images_url[i]).into(img);
+//        img.setImageResource(images[i]);
 
         return view;
     }

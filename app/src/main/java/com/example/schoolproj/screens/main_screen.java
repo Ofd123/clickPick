@@ -36,7 +36,7 @@ public class main_screen extends MasterActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_screen);
-        
+
         // Initialize GeminiManager
         geminiManager = GeminiManager.getInstance();
 
@@ -172,11 +172,11 @@ public class main_screen extends MasterActivity
             }
             else if (requestCode == Codes.GALLERY_REQUEST_CODE.ordinal())
             {
-                 // Note: Gallery usually returns a Uri, but following existing logic style
-                 if (data != null && data.getExtras() != null)
-                 {
-                     imageBitmap = (Bitmap) data.getExtras().get("data");
-                 }
+                // Note: Gallery usually returns a Uri, but following existing logic style
+                if (data != null && data.getExtras() != null)
+                {
+                    imageBitmap = (Bitmap) data.getExtras().get("data");
+                }
             }
 
             if (imageBitmap != null)

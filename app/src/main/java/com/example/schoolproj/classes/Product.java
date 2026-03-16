@@ -7,7 +7,7 @@ public class Product implements Serializable
     String product_id;
     String product_name;
     Double price;
-    String image;
+    String image_url;
     String description;
     String store_name;
     String store_url;
@@ -18,7 +18,7 @@ public class Product implements Serializable
     {
         this.product_name = product_name;
         this.price = price;
-        this.image = image;
+        this.image_url = image;
         this.description = description;
         this.store_name = store_name;
         this.store_url = store_url;
@@ -36,7 +36,7 @@ public class Product implements Serializable
         this.product_id = product_id;
         this.product_name = product_name;
         this.price = price;
-        this.image = image;
+        this.image_url = image;
         this.description = description;
         this.store_name = store_name;
         this.store_url = store_url;
@@ -63,12 +63,12 @@ public class Product implements Serializable
         this.price = price;
     }
 
-    public String getImage() {
-        return image;
+    public String getImageUrl() {
+        return image_url;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setImageUrl(String image) {
+        this.image_url = image;
     }
 
     public String getDescription() {

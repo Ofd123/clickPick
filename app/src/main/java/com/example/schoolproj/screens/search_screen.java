@@ -54,12 +54,12 @@ public class search_screen extends MasterActivity
         searchParameters = new ArrayList<>();
 
         Intent intent = getIntent();
-        
+
         // 1. Check if we came from Image Search (JSON string)
         String searchDetailsJson = intent.getStringExtra("searchDetails");
         if (searchDetailsJson != null) {
             parseInitialSearchDetails(searchDetailsJson);
-        } 
+        }
         // 2. Check if we came from a manual flow (Serializable List)
         else {
             List<SearchItemParameter> params = (List<SearchItemParameter>) intent.getSerializableExtra("item details");
@@ -116,16 +116,16 @@ public class search_screen extends MasterActivity
 
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject obj = jsonArray.getJSONObject(i);
-                
+
                 Product result = new Product(
-                    obj.optString("product_name", "N/A"),
-                    obj.has("price") && !obj.isNull("price") ? obj.getDouble("price") : null,
-                    obj.optString("image", ""),
-                    obj.optString("description", ""),
-                    obj.optString("store_name", "Unknown"),
-                    obj.optString("store_url", ""),
-                    obj.optString("store_location", ""),
-                    obj.optString("other_details", "")
+                        obj.optString("product_name", "N/A"),
+                        obj.has("price") && !obj.isNull("price") ? obj.getDouble("price") : null,
+                        obj.optString("image", ""),
+                        obj.optString("description", ""),
+                        obj.optString("store_name", "Unknown"),
+                        obj.optString("store_url", ""),
+                        obj.optString("store_location", ""),
+                        obj.optString("other_details", "")
                 );
                 results.add(result);
             }
@@ -149,7 +149,7 @@ public class search_screen extends MasterActivity
                 runOnUiThread(() -> {
                     pd.dismiss();
                     parseGeminiResponse(result);
-                    
+
                     if (!results.isEmpty()) {
                         finalizeSearch(searchQuery);
                     } else {
