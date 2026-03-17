@@ -31,7 +31,7 @@ public class search_result_screen extends MasterActivity implements AdapterView.
 
         ListView listView = findViewById(R.id.results);
         Intent searchResults = getIntent();
-        results = (ArrayList<Product>) getIntent().getSerializableExtra("results");
+        results = (ArrayList<Product>) searchResults.getSerializableExtra("results");
 
         if (results != null)
         {
@@ -39,20 +39,22 @@ public class search_result_screen extends MasterActivity implements AdapterView.
             String[] names = new String[size];
             String[] prices = new String[size];
             String[] companies = new String[size];
-            int[] images = new int[size];
+            String[] images = new String[size];
 
-            for (int i = 0; i < size; i++) {
+            for (int i = 0; i < size; i++)
+            {
                 Product p = results.get(i);
                 names[i] = p.getProduct_name();
                 prices[i] = String.valueOf(p.getPrice());
                 companies[i] = p.getStore_name();
-                try {
-                    //TODO: HANDLE TAKING A PIC FROM THE SITE URL
-                    //images[i] = getResources().getIdentifier(p.getImage(), "drawable", getPackageName());
-                } catch (Exception e) {
-                    images[i] = R.drawable.picture_not_found;
+                if(p.getImageUrl() != null && !p.getImageUrl().isEmpty() && !p.getImageUrl().equals("null"))
+                {
+                    images[i] = p.getImageUrl();
                 }
-
+                else
+                {
+                    images[i] = ""; //in case there is no image, i would prefer handling it here and have a decisive 'empty' value
+                }
             }
             ArrayAdapter<String> adp = new ArrayAdapter<String>(this, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, names);
             SearchResultsAdapter resultsAdp = new SearchResultsAdapter(this, images, names, prices, companies);
@@ -66,11 +68,9 @@ public class search_result_screen extends MasterActivity implements AdapterView.
     {
         Intent productDetails = new Intent(this, product_details_screen.class);
         ArrayList<Product> tmpList = new ArrayList<>();
-        tmpList.add(results.get(pos)); //since i could not transfer the object directly, i am packing it in a list
+        tmpList.add(results.get(pos)); //since the product could not be transferred directly, i am packing it in a list
         productDetails.putExtra("product", (ArrayList<Product>) tmpList);
         startActivity(productDetails);
-
-
     }
 
     @Override

@@ -79,7 +79,7 @@ public class saved_items_screen extends MasterActivity implements AdapterView.On
         String[] names = new String[size];
         String[] prices = new String[size];
         String[] companies = new String[size];
-        int[] images = new int[size];
+        String[] images = new String[size];
 
         for (int i = 0; i < size; i++)
         {
@@ -87,16 +87,14 @@ public class saved_items_screen extends MasterActivity implements AdapterView.On
             names[i] = p.getProduct_name();
             prices[i] = String.valueOf(p.getPrice());
             companies[i] = p.getStore_name();
-            try
+            if(p.getImageUrl() != null && !p.getImageUrl().isEmpty() && !p.getImageUrl().equals("null"))
             {
-                //TODO: HANDLE TAKING A PIC FROM THE SITE URL
-                //images[i] = getResources().getIdentifier(p.getImage(), "drawable", getPackageName());
+                images[i] = p.getImageUrl();
             }
-            catch (Exception e)
+            else
             {
-                images[i] = R.drawable.picture_not_found;
+                images[i] = ""; //in case there is no image, i would prefer handling it here and have a decisive 'empty' value
             }
-
         }
         ArrayAdapter<String> adp = new ArrayAdapter<String>(this, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, names);
         SearchResultsAdapter resultsAdp = new SearchResultsAdapter(this, images, names, prices, companies);

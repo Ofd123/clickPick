@@ -59,8 +59,14 @@ public class SearchResultsAdapter extends BaseAdapter
         p_name.setText(names[i]);
         p_price.setText(prices[i]);
         p_company.setText(companies[i]);
-        Picasso.get().load(images_url[i]).into(img);
-//        img.setImageResource(images[i]);
+        if(images_url[i] != null && !images_url[i].isEmpty() && !images_url[i].equals("null"))
+        {
+            Picasso.get().load(images_url[i]).into(img);
+        }
+        else
+        {
+            img.setImageResource(R.drawable.picture_not_found);
+        }
 
         return view;
     }

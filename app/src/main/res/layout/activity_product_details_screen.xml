@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".screens.product_details_screen"
-    android:padding="16dp">
+    android:padding="30dp">
 
     <Space
         android:layout_width="match_parent"
@@ -16,18 +16,58 @@
 
     <LinearLayout
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/backBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="back"
+            android:text="back" />
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="@integer/material_motion_duration_long_2" />
+
+        <Button
+            android:id="@+id/saveBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="save"
+            android:text="save product" />
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="5" />
+    </LinearLayout>
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="200px"
         android:layout_weight="1"
-        android:orientation="horizontal"
-        android:padding="16dp">
+        android:orientation="horizontal">
 
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="200px"
-            android:layout_weight="3
-"
-
+            android:layout_weight="3"
             android:orientation="vertical">
 
             <TextView
@@ -64,12 +104,14 @@
             android:orientation="horizontal">
 
             <ImageView
-                android:id="@+id/imageView"
+                android:id="@+id/productImage"
                 android:layout_width="150px"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 app:srcCompat="@android:drawable/ic_menu_camera" />
         </LinearLayout>
+
+
 
     </LinearLayout>
 
@@ -90,30 +132,5 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="horizontal">
-
-        <Space
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
-
-        <Button
-            android:id="@+id/button2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:onClick="back"
-            android:text="back" />
-
-        <Space
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="5" />
-    </LinearLayout>
 
 </LinearLayout>

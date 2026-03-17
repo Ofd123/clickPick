@@ -114,22 +114,31 @@ public class search_screen extends MasterActivity
             JSONArray jsonArray = new JSONArray(cleanResponse);
             results.clear(); // Clear previous results
 
-            for (int i = 0; i < jsonArray.length(); i++) {
+            for (int i = 0; i < jsonArray.length(); i++)
+            {
                 JSONObject obj = jsonArray.getJSONObject(i);
 
-                Product result = new Product(
-                        obj.optString("product_name", "N/A"),
-                        obj.has("price") && !obj.isNull("price") ? obj.getDouble("price") : null,
-                        obj.optString("image", ""),
-                        obj.optString("description", ""),
-                        obj.optString("store_name", "Unknown"),
-                        obj.optString("store_url", ""),
-                        obj.optString("store_location", ""),
-                        obj.optString("other_details", "")
-                );
+                Product result = new Product();
+                if(obj.has("price") && !obj.isNull("price"))
+                {
+                    result.setPrice(obj.getDouble("price"));
+                }
+                else
+                {
+                    result.setPrice(null);
+                }
+                result.setProduct_name(obj.getString("product_name"));
+                result.setStore_name(obj.getString("store_name"));
+                result.setStore_url(obj.getString("store_url"));
+                result.setStore_location(obj.getString("store_location"));
+                result.setDescription(obj.getString("description"));
+                result.setImageUrl(obj.optString("image", ""));
+                result.setOther_details(obj.optString("other_details", ""));
+
                 results.add(result);
             }
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
             Log.e(TAG, "parseGeminiResponse failed", e);
         }
     }
@@ -150,9 +159,12 @@ public class search_screen extends MasterActivity
                     pd.dismiss();
                     parseGeminiResponse(result);
 
-                    if (!results.isEmpty()) {
+                    if (!results.isEmpty())
+                    {
                         finalizeSearch(searchQuery);
-                    } else {
+                    }
+                    else
+                    {
                         Toast.makeText(search_screen.this, "No products found", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -170,12 +182,14 @@ public class search_screen extends MasterActivity
         });
     }
 
-    private void finalizeSearch(String searchQuery) {
+    private void finalizeSearch(String searchQuery)
+    {
         // Generate the search Object
         SearchDetails thisSearch = new SearchDetails(searchQuery, results);
 
         // Upload to Firebase
-        if (connected_user != null) {
+        if (connected_user != null)
+        {
             String userID = connected_user.getUserID();
             String searchID = searchHistoryRef.child(userID).push().getKey();
             thisSearch.setSearch_id(searchID);
