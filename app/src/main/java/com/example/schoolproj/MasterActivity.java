@@ -1,5 +1,7 @@
 package com.example.schoolproj;
 
+import static com.example.schoolproj.FireBaseFiles.FBRef.refAuth;
+
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
@@ -8,6 +10,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.schoolproj.classes.User;
+import com.google.firebase.auth.FirebaseUser;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,13 +33,15 @@ public class MasterActivity extends AppCompatActivity
 
     }
     protected SharedPreferences settings;
-    protected User connected_user;
+    protected User connected_user = new User();
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         settings = getSharedPreferences("settings", MODE_PRIVATE);
+
+        loadUserData();
 
         // Handle the back button press TODO: might change - Master activity will just ignore it
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
@@ -56,6 +61,39 @@ public class MasterActivity extends AppCompatActivity
 
 
     }
+
+    /**
+     * Loads user data from SharedPreferences or Firebase Auth.
+     * @return true if user is connected, false otherwise.
+     */
+    protected boolean loadUserData()
+    {
+        boolean stayConnected = settings.getBoolean("stayConnected", false);
+        if (stayConnected)
+        {
+            String userID = settings.getString("userID", null);
+            if (userID != null && !userID.isEmpty()) {
+                String username = settings.getString("username", "User");
+                connected_user.setUserID(userID);
+                connected_user.setUsername(username);
+                connected_user.setLastLogin(settings.getLong("lastLogin", System.currentTimeMillis()));
+                connected_user.setCreationDate(settings.getLong("creationDate", 0));
+                return true;
+            }
+        }
+
+        // Fallback: Check if there's an active Firebase session even if "remember me" wasn't checked
+        FirebaseUser fbUser = refAuth.getCurrentUser();
+        if (fbUser != null) {
+            connected_user.setUserID(fbUser.getUid());
+            String email = fbUser.getEmail();
+            connected_user.setUsername(email != null ? email.split("@")[0] : "User");
+            return true;
+        }
+
+        return false;
+    }
+
     public String jsonToString(JSONObject jsonObject) {
         if (jsonObject == null) return "";
         return jsonObject.toString();

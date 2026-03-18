@@ -25,28 +25,30 @@ public class search_history_screen extends MasterActivity {
     ListView personalHistory;
     List<SearchDetails> historyList;
     List<String> searchQueries;
+    ArrayAdapter<String> adp;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_history_screen);
 
         personalHistory = findViewById(R.id.personalHistory);
         historyList = new ArrayList<>();
-        //TODO: later features
-        //personalHistory.setOnItemClickListener(this);
+        searchQueries = new ArrayList<>();
 
-        if (connected_user != null)
+        adp = new ArrayAdapter<>(this, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, searchQueries);
+        personalHistory.setAdapter(adp);
+
+        if (connected_user != null && connected_user.getUserID() != null && !connected_user.getUserID().isEmpty())
         {
             loadSearchHistory();
         }
         else
         {
             Toast.makeText(this, "Error: user not logged in", Toast.LENGTH_SHORT).show();
+            finish();
         }
-
-        ArrayAdapter<String> adp = new ArrayAdapter<>(this, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, searchQueries);
-        personalHistory.setAdapter(adp);
     }
 
     private void loadSearchHistory()
@@ -57,16 +59,17 @@ public class search_history_screen extends MasterActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot)
             {
                 historyList.clear();
+                searchQueries.clear();
                 for (DataSnapshot data : snapshot.getChildren())
                 {
                     SearchDetails search = data.getValue(SearchDetails.class);
                     if (search != null)
                     {
-                        //happened the search object (for re-search and the query itself
                         historyList.add(search);
                         searchQueries.add(search.getSearch_query());
                     }
                 }
+                adp.notifyDataSetChanged();
             }
 
             @Override
@@ -76,7 +79,6 @@ public class search_history_screen extends MasterActivity {
             }
         });
     }
-    //TODO: add listener to show the results for the clicked search
 
     public void home(View view)
     {

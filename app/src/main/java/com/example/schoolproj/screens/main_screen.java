@@ -48,25 +48,6 @@ public class main_screen extends MasterActivity
         }
     }
 
-    /**
-     * Loads user data from SharedPreferences.
-     * @return true if user is connected, false otherwise.
-     */
-    private boolean loadUserData()
-    {
-        boolean stayConnected = settings.getBoolean("stayConnected", false);
-        if (stayConnected)
-        {
-            String userID = settings.getString("userID", "");
-            String username = settings.getString("username", "User");
-            connected_user = new User(userID, username);
-            connected_user.setLastLogin(settings.getLong("lastLogin", System.currentTimeMillis()));
-            connected_user.setCreationDate(settings.getLong("creationDate", 0));
-            return true;
-        }
-        return false;
-    }
-
     // ---------------------------------------------------------------------------------------------
     public void regularSearch(View view)
     {
@@ -247,7 +228,11 @@ public class main_screen extends MasterActivity
         startActivity(intent);
     }
 
-    public void favorites(View view) {}
+    public void favorites(View view)
+    {
+        Intent intent = new Intent(this,saved_items_screen.class);
+        startActivity(intent);
+    }
     public void allHistory(View view) {}
     public void goToSettings(View view) {}
 }

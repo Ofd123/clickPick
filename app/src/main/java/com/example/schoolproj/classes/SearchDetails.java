@@ -1,48 +1,40 @@
 package com.example.schoolproj.classes;
 
-import android.os.Build;
+import com.google.firebase.database.Exclude;
+import com.google.firebase.database.IgnoreExtraProperties;
 
-import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+@IgnoreExtraProperties
 public class SearchDetails
 {
-    String search_id;
-    LocalDateTime search_date;
-    LocalDateTime delete_date;
-    String search_query;
-    List<Product> search_result;
-    Boolean compare_price;
+    private String search_id;
+    private Long search_date;
+    private Long delete_date;
+    private String search_query;
+    private List<Product> search_result;
+    private Boolean compare_price;
 
     public SearchDetails()
     {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-        {
-            this.search_date = LocalDateTime.now();
-            this.delete_date = LocalDateTime.now().plusWeeks(2); //delete after 2 weeks
-        }
-    }
-    public SearchDetails(String search_query, List<Product> search_result, boolean compare_price)
-    {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-        {
-            this.search_date = LocalDateTime.now();
-            this.delete_date = LocalDateTime.now().plusWeeks(2); //delete after 2 weeks
-        }
-        this.search_query = search_query;
-        this.search_result = search_result;
-        this.compare_price = compare_price;
+        // Default constructor required for calls to DataSnapshot.getValue(SearchDetails.class)
+        this.search_date = System.currentTimeMillis();
+        this.delete_date = this.search_date + (14L * 24 * 60 * 60 * 1000); // 2 weeks
     }
 
     public SearchDetails(String search_query, List<Product> search_result)
     {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-        {
-            this.search_date = LocalDateTime.now();
-            this.delete_date = LocalDateTime.now().plusWeeks(2); //delete after 2 weeks
-        }
+        this();
         this.search_query = search_query;
         this.search_result = search_result;
+    }
+
+    public SearchDetails(String search_query, List<Product> search_result, boolean compare_price)
+    {
+        this(search_query, search_result);
+        this.compare_price = compare_price;
     }
 
     public String getSearch_id()
@@ -53,20 +45,20 @@ public class SearchDetails
     {
         this.search_id = search_id;
     }
-    public LocalDateTime getSearch_date()
+    public Long getSearch_date()
     {
         return search_date;
     }
-    public void setSearch_date(LocalDateTime search_date)
+    public void setSearch_date(Long search_date)
     {
         this.search_date = search_date;
     }
-    public LocalDateTime getDelete_date()
+    public Long getDelete_date()
     {
         return delete_date;
     }
 
-    public void setDelete_date(LocalDateTime delete_date) {
+    public void setDelete_date(Long delete_date) {
         this.delete_date = delete_date;
     }
 
@@ -92,5 +84,17 @@ public class SearchDetails
 
     public void setCompare_price(Boolean compare_price) {
         this.compare_price = compare_price;
+    }
+
+    @Exclude
+    public Map<String, Object> toMap() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("search_id", search_id);
+        result.put("search_date", search_date);
+        result.put("delete_date", delete_date);
+        result.put("search_query", search_query);
+        result.put("search_result", search_result);
+        result.put("compare_price", compare_price);
+        return result;
     }
 }

@@ -4,6 +4,8 @@ import static com.example.schoolproj.FireBaseFiles.FBRef.favoritesRef;
 import static com.example.schoolproj.FireBaseFiles.FBRef.refAuth;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -19,6 +21,8 @@ import com.example.schoolproj.classes.Product;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseUser;
+import com.klinker.android.link_builder.Link;
+import com.klinker.android.link_builder.LinkBuilder;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -45,6 +49,7 @@ public class product_details_screen extends AppCompatActivity
         //get the product from the intent and convert it to a product object
         Intent productDetails = getIntent();
         ArrayList<Product> tmpList = (ArrayList<Product>) productDetails.getSerializableExtra("product");
+
         if (tmpList != null && !tmpList.isEmpty()) 
         {
             product = tmpList.get(0);
@@ -64,10 +69,31 @@ public class product_details_screen extends AppCompatActivity
             pName.setText(product.getProduct_name());
             pPrice.setText(String.valueOf(product.getPrice()));
             pCompany.setText(product.getStore_name());
-            String extra = "store url: " + product.getStore_url() + "\n" + "store location: " + product.getStore_location() + "\n";
+            
+            String storeUrlStr = product.getStore_url();
+            String extra = "Store URL: " + storeUrlStr + "\n" + "store location: " + product.getStore_location() + "\n";
             extra += product.getOther_details();
             extra += "\n" + product.getDescription();
             extraData.setText(extra);
+
+            if (storeUrlStr != null && !storeUrlStr.isEmpty() && !storeUrlStr.equals("null")) {
+                Link link = new Link(storeUrlStr)
+                        .setTextColor(Color.BLUE)
+                        .setTextColorOfHighlightedLink(Color.CYAN)
+                        .setUnderlined(true)
+                        .setBold(true)
+                        .setOnClickListener(url -> {
+                            if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                                url = "https://" + url;
+                            }
+                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                            startActivity(intent);
+                        });
+
+                LinkBuilder.on(extraData)
+                        .addLink(link)
+                        .build();
+            }
         }
         else
         {
