@@ -30,12 +30,12 @@
         <activity
             android:name=".screens.search_result_screen"
             android:exported="false" />
-        <activity
-            android:name=".screens.search_results_screan"
-            android:exported="false" />
-        <activity
-            android:name=".search_results_screen"
-            android:exported="false" />
+<!--        <activity-->
+<!--            android:name=".screens.search_results_screan"-->
+<!--            android:exported="false" />-->
+<!--        <activity-->
+<!--            android:name=".search_results_screen"-->
+<!--            android:exported="false" />-->
         <activity
             android:name=".screens.search_screen"
             android:exported="false" />
