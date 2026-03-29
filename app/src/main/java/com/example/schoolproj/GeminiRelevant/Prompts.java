@@ -134,6 +134,44 @@ public class Prompts
                     "\n" +
                     "**Current Request:**\n";
 
+    public static String SEARCH_PROMPT =  "Extract product listings from the text below.\n\n" +
+
+            "Return a JSON array of up to 15-20 products.\n\n" +
+
+            "Rules:\n" +
+            "- Include multiple results from different stores\n" +
+            "- Prefer full products (NOT parts like 'left earbud only', 'case only')\n" +
+            "- Avoid duplicates (same product + same store)\n" +
+            "- Keep results diverse (different sellers, prices, conditions)\n" +
+            "- DO NOT invent data\n\n" +
+
+            "DESCRIPTION RULE (VERY IMPORTANT):\n" +
+            "- The description MUST be based ONLY on the given text\n" +
+            "- Extract key features (brand, model, condition, specs)\n" +
+            "- Write a clear summary of the product\n" +
+            "- DO NOT leave description null if any info exists\n" +
+            "- DO NOT make up features that are not in the text\n\n" +
+
+            "Output format (STRICT JSON ONLY):\n" +
+            "[\n" +
+            "{\n" +
+            "  \"product_name\": string,\n" +
+            "  \"price\": number, base the price only from the text and do not make up the price,\n" +
+            "  \"image\": string or null,\n" +
+            "  \"description\": string or null,\n" +
+            "  \"store_name\": string,\n" +
+            "  \"store_url\": string,\n" +
+            "  \"store_location\": string or null,\n" +
+            "  \"other_details\": string or null\n" +
+            "}\n" +
+            "]\n\n" +
+
+            "Important:\n" +
+            "- Return ONLY JSON (no explanation)\n" +
+            "- Clean messy text\n" +
+            "- If field missing → null\n\n" +
+
+            "TEXT:\n" ;
 
 
 

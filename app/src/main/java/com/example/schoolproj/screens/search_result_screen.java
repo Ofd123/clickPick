@@ -41,19 +41,34 @@ public class search_result_screen extends MasterActivity implements AdapterView.
             String[] companies = new String[size];
             String[] images = new String[size];
 
-            for (int i = 0; i < size; i++)
-            {
+            for (int i = 0; i < size; i++) {
                 Product p = results.get(i);
-                names[i] = p.getProduct_name();
-                prices[i] = String.valueOf(p.getPrice());
-                companies[i] = p.getStore_name();
-                if(p.getImageUrl() != null && !p.getImageUrl().isEmpty() && !p.getImageUrl().equals("null"))
-                {
-                    images[i] = p.getImageUrl();
+
+                // ✅ Name
+                names[i] = (p.getProduct_name() != null)
+                        ? p.getProduct_name()
+                        : "Unknown Product";
+
+                // ✅ Price formatting
+                if (p.getPrice() != null) {
+                    prices[i] = "$" + String.format("%.2f", p.getPrice());
+                } else {
+                    prices[i] = "Price unavailable";
                 }
-                else
-                {
-                    images[i] = ""; //in case there is no image, i would prefer handling it here and have a decisive 'empty' value
+
+                // ✅ Store
+                companies[i] = (p.getStore_name() != null)
+                        ? p.getStore_name()
+                        : "Unknown Store";
+
+                // ✅ Image
+                if (p.getImageUrl() != null &&
+                        !p.getImageUrl().isEmpty() &&
+                        !p.getImageUrl().equals("null")) {
+
+                    images[i] = p.getImageUrl();
+                } else {
+                    images[i] = ""; // fallback
                 }
             }
             ArrayAdapter<String> adp = new ArrayAdapter<String>(this, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, names);

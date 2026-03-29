@@ -4,9 +4,11 @@ import static android.content.ContentValues.TAG;
 import static com.example.schoolproj.GeminiRelevant.Prompts.GET_DATA_FROM_IMAGE;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -25,11 +27,14 @@ import com.example.schoolproj.classes.User;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+
 public class main_screen extends MasterActivity
 {
     GeminiManager geminiManager;
     JSONObject searchDetails;
     Intent signinIntent, loginIntent;
+    private boolean isAuthRedirecting = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -40,10 +45,28 @@ public class main_screen extends MasterActivity
         // Initialize GeminiManager
         geminiManager = GeminiManager.getInstance();
 
+        // Pre-initialize auth intents
+        signinIntent = new Intent(this, signUp_screen.class);
+        loginIntent = new Intent(this, login_screen.class);
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        // Check if user is still logged in every time we return to this screen,
+        // unless we are currently in the middle of a signup/login switch.
+        if (!isAuthRedirecting)
+        {
+            loadData();
+        }
+        isAuthRedirecting = false;
+    }
+
+    void loadData()
+    {
         if (!loadUserData())
         {
-            signinIntent = new Intent(this, signUp_screen.class);
-            loginIntent = new Intent(this, login_screen.class);
             startActivityForResult(signinIntent, Codes.SIGN_IN.ordinal());
         }
     }
@@ -55,7 +78,37 @@ public class main_screen extends MasterActivity
         startActivityForResult(intent, Codes.SEARCH_REQUEST_CODE.ordinal());
     }
     // ---------------------------------------------------------------------------------------------
+    public void showAlert()
+    {
+        AlertDialog.Builder secondChance = new AlertDialog.Builder(this);
+        secondChance.setTitle("Please make sure");
+        secondChance.setMessage("providing a corrupted image or an image where it is hard to understand what is being searched for may result in poor results, please send the most detailed picture that you can");
+        secondChance.setPositiveButton("continue", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                dialog.dismiss();
+                selectImageSource();
+            }
+        });
+        secondChance.setNegativeButton("back", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                dialog.dismiss();
+            }
+        });
+        secondChance.show();
+    }
+    // ---------------------------------------------------------------------------------------------
     public void imageSearch(View view)
+    {
+        showAlert();
+    }
+
+    private void selectImageSource()
     {
         try
         {
@@ -84,7 +137,7 @@ public class main_screen extends MasterActivity
         }
         catch (Exception e)
         {
-            Log.e(TAG, "imageSearch error: " + e.getMessage());
+            Log.e(TAG, "selectImageSource error: " + e.getMessage());
         }
     }
     // ---------------------------------------------------------------------------------------------
@@ -128,10 +181,12 @@ public class main_screen extends MasterActivity
 
                 if (state == Codes.LOG_IN.ordinal())
                 {
+                    isAuthRedirecting = true;
                     startActivityForResult(loginIntent, Codes.LOG_IN.ordinal());
                 }
                 else if (state == Codes.SIGN_IN.ordinal())
                 {
+                    isAuthRedirecting = true;
                     startActivityForResult(signinIntent, Codes.SIGN_IN.ordinal());
                 }
                 else if (state == Codes.REMEMBER_ME.ordinal())
@@ -153,10 +208,14 @@ public class main_screen extends MasterActivity
             }
             else if (requestCode == Codes.GALLERY_REQUEST_CODE.ordinal())
             {
-                // Note: Gallery usually returns a Uri, but following existing logic style
-                if (data != null && data.getExtras() != null)
+                if (data != null && data.getData() != null)
                 {
-                    imageBitmap = (Bitmap) data.getExtras().get("data");
+                    Uri imageUri = data.getData();
+                    try {
+                        imageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+                    } catch (IOException e) {
+                        Log.e(TAG, "Error loading gallery image: " + e.getMessage());
+                    }
                 }
             }
 
@@ -233,6 +292,14 @@ public class main_screen extends MasterActivity
         Intent intent = new Intent(this,saved_items_screen.class);
         startActivity(intent);
     }
-    public void allHistory(View view) {}
-    public void goToSettings(View view) {}
+    public void allHistory(View view)
+    {
+//        Intent intent = new Intent(this,all_history_screen.class);
+//        startActivity(intent);
+    }
+    public void goToSettings(View view)
+    {
+        Intent intent = new Intent(this, settings_screen.class);
+        startActivity(intent);
+    }
 }

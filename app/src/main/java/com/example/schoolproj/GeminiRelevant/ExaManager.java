@@ -22,7 +22,51 @@ public class ExaManager
 
     private ExaManager()
     {
-        client = new OkHttpClient();
+        client = new OkHttpClient.Builder()
+                .connectTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+                .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+                .writeTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+                .build();
+    }
+
+    public JSONArray getContents(JSONArray urlsArray) throws Exception
+    {
+        StringBuilder urlsBuilder = new StringBuilder("[");
+        for (int i = 0; i < urlsArray.length(); i++)
+        {
+            urlsBuilder.append("\"").append(urlsArray.getString(i)).append("\"");
+            if (i != urlsArray.length() - 1) urlsBuilder.append(",");
+        }
+        urlsBuilder.append("]");
+
+        String jsonBody = "{\n" +
+                "  \"urls\": " + urlsBuilder.toString() + ",\n" +
+                "  \"text\": { \"max_characters\": 8000 }\n" +
+                "}";
+
+        RequestBody body = RequestBody.create(
+                jsonBody,
+                MediaType.parse("application/json")
+        );
+
+        Request request = new Request.Builder()
+                .url("https://api.exa.ai/contents")
+                .addHeader("x-api-key", API_KEY)
+                .addHeader("Content-Type", "application/json")
+                .post(body)
+                .build();
+
+        Response response = client.newCall(request).execute();
+
+        if (!response.isSuccessful())
+        {
+            throw new IOException("Contents failed: " + response);
+        }
+
+        String responseBody = response.body().string();
+        JSONObject json = new JSONObject(responseBody);
+
+        return json.getJSONArray("results");
     }
 
     public static synchronized ExaManager getInstance()
@@ -33,6 +77,7 @@ public class ExaManager
         }
         return instance;
     }
+
     public JSONArray search(String queryInput) throws Exception
     {
         // Escape quotes

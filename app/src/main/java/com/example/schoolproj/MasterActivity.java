@@ -1,9 +1,11 @@
 package com.example.schoolproj;
 
+import static android.content.ContentValues.TAG;
 import static com.example.schoolproj.FireBaseFiles.FBRef.refAuth;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
@@ -93,6 +95,29 @@ public class MasterActivity extends AppCompatActivity
 
         return false;
     }
+    protected boolean signout()
+    {
+        try
+        {
+            refAuth.signOut();
+            connected_user = new User();
+            // Clear SharedPreferences
+            SharedPreferences.Editor editor = settings.edit();
+            editor.remove("stayConnected");
+            editor.remove("userID");
+            editor.remove("username");
+            editor.remove("lastLogin");
+            editor.remove("creationDate");
+            editor.apply();
+            return true;
+        }
+        catch (Exception e)
+        {
+            Log.e(TAG, "signout error: " + e.getMessage());
+            return false;
+        }
+    }
+
 
     public String jsonToString(JSONObject jsonObject) {
         if (jsonObject == null) return "";
