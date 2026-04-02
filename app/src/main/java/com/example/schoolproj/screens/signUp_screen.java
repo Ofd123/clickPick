@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.schoolproj.MasterActivity;
 import com.example.schoolproj.R;
@@ -139,4 +140,6 @@ public class signUp_screen extends MasterActivity
         setResult(Activity.RESULT_OK, resultIntent);
         finish();
     }
+
+
 }

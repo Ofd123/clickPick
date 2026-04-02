@@ -2,6 +2,7 @@ package com.example.schoolproj.screens;
 
 import static com.example.schoolproj.FireBaseFiles.FBRef.favoritesRef;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -107,7 +108,13 @@ public class saved_items_screen extends MasterActivity implements AdapterView.On
     }
 
     @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+    {
+        Product selectedProduct = savedProducts.get(position);
+        ArrayList<Product> productList = new ArrayList<>();
+        productList.add(selectedProduct);
+        Intent intent = new Intent(this, product_details_screen.class);
+        intent.putExtra("product", productList);
+        startActivity(intent);
     }
 }

@@ -4,10 +4,14 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 
-    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
 
     <queries>
         <intent>
@@ -25,6 +29,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SchoolProj">
         <activity
+            android:name=".screens.show_all_history_screen"
+            android:exported="false" />
+        <activity
+            android:name=".screens.signUp_screen$all_search_history_screen"
+            android:exported="false" />
+        <activity
             android:name=".screens.product_details_screen"
             android:exported="false" />
         <activity
@@ -38,6 +48,7 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

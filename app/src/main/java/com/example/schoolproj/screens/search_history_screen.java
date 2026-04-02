@@ -2,8 +2,10 @@ package com.example.schoolproj.screens;
 
 import static com.example.schoolproj.FireBaseFiles.FBRef.searchHistoryRef;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -12,6 +14,7 @@ import androidx.annotation.NonNull;
 
 import com.example.schoolproj.MasterActivity;
 import com.example.schoolproj.R;
+import com.example.schoolproj.classes.Product;
 import com.example.schoolproj.classes.SearchDetails;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -20,7 +23,8 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class search_history_screen extends MasterActivity {
+public class search_history_screen extends MasterActivity implements AdapterView.OnItemClickListener
+{
 
     ListView personalHistory;
     List<SearchDetails> historyList;
@@ -39,6 +43,7 @@ public class search_history_screen extends MasterActivity {
 
         adp = new ArrayAdapter<>(this, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, searchQueries);
         personalHistory.setAdapter(adp);
+        personalHistory.setOnItemClickListener(this);
 
         if (connected_user != null && connected_user.getUserID() != null && !connected_user.getUserID().isEmpty())
         {
@@ -78,6 +83,20 @@ public class search_history_screen extends MasterActivity {
                 Toast.makeText(search_history_screen.this, "Failed to load history: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+    {
+        SearchDetails selectedSearch = historyList.get(position);
+        List<Product> searchResults = selectedSearch.getSearch_result();
+        if (searchResults != null) {
+            Intent intent = new Intent(this, search_result_screen.class);
+            intent.putExtra("results", (ArrayList<Product>) searchResults);
+            startActivity(intent);
+        } else {
+            Toast.makeText(this, "No results found for this search", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void home(View view)

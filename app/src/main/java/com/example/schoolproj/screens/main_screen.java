@@ -294,8 +294,8 @@ public class main_screen extends MasterActivity
     }
     public void allHistory(View view)
     {
-//        Intent intent = new Intent(this,all_history_screen.class);
-//        startActivity(intent);
+        Intent intent = new Intent(this,show_all_history_screen.class);
+        startActivity(intent);
     }
     public void goToSettings(View view)
     {
