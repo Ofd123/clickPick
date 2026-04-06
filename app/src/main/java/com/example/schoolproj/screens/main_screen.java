@@ -317,4 +317,10 @@ public class main_screen extends MasterActivity
         Intent intent = new Intent(this, credits_screen.class);
         startActivity(intent);
     }
+
+    public void howToSearch(View view)
+    {
+        Intent intent = new Intent(this, how_to_search_screen.class);
+        startActivity(intent);
+    }
 }

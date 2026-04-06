@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="#F4F6F8"
     android:orientation="vertical"
-    android:padding="24dp"
+    android:padding="30dp"
     tools:context=".screens.main_screen">
 
     <LinearLayout
@@ -49,11 +49,22 @@
             android:id="@+id/creditsText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Credits"
             android:onClick="credits"
+            android:text="Credits"
             android:textColor="#0E5B8E"
             android:textSize="16sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            tools:ignore="TouchTargetSizeCheck" />
+
+        <ImageView
+            android:id="@+id/howToSearchBtn"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:onClick="howToSearch"
+            app:srcCompat="@drawable/ic_help"
+            tools:ignore="ContentDescription,TouchTargetSizeCheck,SpeakableTextPresentCheck" />
     </LinearLayout>
 
     <TextView
@@ -232,7 +243,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:layout_weight="1"
-            android:text="See All Search History"
+            android:text="See all Users Searches"
             android:textColor="#4B5563"
             android:textSize="16sp"
             android:textStyle="bold" />

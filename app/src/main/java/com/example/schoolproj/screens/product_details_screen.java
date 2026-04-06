@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -41,8 +42,14 @@ public class product_details_screen extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_product_details_screen);
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed()
+            {
+                finish();
+            }
+        });
 
         TextView pName = findViewById(R.id.pName);
         TextView pPrice = findViewById(R.id.pPrice);
@@ -74,14 +81,39 @@ public class product_details_screen extends AppCompatActivity
 
             //extract the data
             pName.setText(product.getProduct_name());
-            pPrice.setText(String.valueOf(product.getPrice()));
-            pPriceType.setText(product.getPrice_type());
+
+            if(product.getPrice() == null)
+            {
+                pPrice.setText("Price unavailable");
+                pPriceType.setText("");
+            }
+            else if (!(product.getPrice() > 0))
+            {
+                pPrice.setText("This is a Store page");
+                pPriceType.setText("");
+            }
+            else
+            {
+                pPrice.setText(String.format("%.2f", product.getPrice()) + "$");
+                pPriceType.setText(product.getPrice_type());
+            }
             pCompany.setText(product.getStore_name());
             
             String storeUrlStr = product.getStore_url();
-            String extra = "Store URL: " + storeUrlStr + "\n" + "store location: " + product.getStore_location() + "\n";
-            extra += product.getOther_details();
-            extra += "\n" + product.getDescription();
+            String extra = "Store URL: " + storeUrlStr + "\n";
+            if (product.getStore_location() != null && !product.getStore_location().isEmpty())
+            {
+                extra += "store location: " + product.getStore_location() + "\n";
+            }
+
+            if (product.getOther_details() != null && !product.getOther_details().isEmpty())
+            {
+                extra += product.getOther_details() + "\n";
+            }
+
+            extra += product.getDescription();
+
+
             extraData.setText(extra);
 
             if (storeUrlStr != null && !storeUrlStr.isEmpty() && !storeUrlStr.equals("null")) {

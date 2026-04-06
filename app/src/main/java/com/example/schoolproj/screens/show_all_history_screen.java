@@ -14,6 +14,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -45,6 +46,13 @@ public class show_all_history_screen extends MasterActivity implements AdapterVi
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_all_history_screen);
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed()
+            {
+                finish();
+            }
+        });
 
         History = findViewById(R.id.lvSearchHistory);
         historyList = new ArrayList<>();

@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 
 import com.example.schoolproj.MasterActivity;
@@ -34,6 +35,13 @@ public class saved_items_screen extends MasterActivity implements AdapterView.On
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_saved_items_screen);
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed()
+            {
+                finish();
+            }
+        });
 
         listView = findViewById(R.id.savedItems);
         savedProducts = new ArrayList<>();

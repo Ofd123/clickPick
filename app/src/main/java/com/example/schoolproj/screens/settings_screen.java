@@ -7,6 +7,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -32,6 +33,13 @@ public class settings_screen extends MasterActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed()
+            {
+                finish();
+            }
+        });
 
         tvSettingsDisplayName = findViewById(R.id.tvSettingsDisplayName);
         tvSettingsWhenCreated = findViewById(R.id.tvSettingsWhenCreated);

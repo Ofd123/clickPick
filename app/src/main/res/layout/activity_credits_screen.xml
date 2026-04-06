@@ -7,6 +7,7 @@
     android:layout_height="match_parent"
     android:background="#F8FAFC"
     android:orientation="vertical"
+    android:padding="24dp"
     tools:context=".screens.credits_screen">
 
     <RelativeLayout
@@ -171,7 +172,7 @@
                                 android:layout_height="48dp"
                                 android:background="@android:color/white"
                                 android:padding="12dp"
-                                android:src="@drawable/ic_search" />
+                                android:src="@drawable/firebase_logo" />
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -191,9 +192,11 @@
                             <ImageView
                                 android:layout_width="48dp"
                                 android:layout_height="48dp"
+                                android:src="@drawable/gemini_logo"
                                 android:background="@android:color/white"
+
                                 android:padding="12dp"
-                                android:src="@drawable/ic_search" />
+                                 />
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -215,7 +218,7 @@
                                 android:layout_height="48dp"
                                 android:background="@android:color/white"
                                 android:padding="12dp"
-                                android:src="@drawable/ic_search" />
+                                android:src="@drawable/exa_ai_logo" />
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"

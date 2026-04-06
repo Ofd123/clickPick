@@ -35,6 +35,7 @@ public class MasterActivity extends AppCompatActivity
 
     }
     protected SharedPreferences settings;
+    protected static boolean isLoggedInThisSession = false;
     protected User connected_user = new User();
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -48,11 +49,12 @@ public class MasterActivity extends AppCompatActivity
         // Handle the back button press TODO: might change - Master activity will just ignore it
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
-            public void handleOnBackPressed() {
+            public void handleOnBackPressed() 
+            {
                 AlertDialog adb = new AlertDialog.Builder(MasterActivity.this).create();
                 adb.setTitle("Are you sure you wish to exit?");
                 adb.setButton(AlertDialog.BUTTON_POSITIVE, "Yes", (dialog, which) -> {
-                    finish();
+                    finishAffinity();
                 });
                 adb.setButton(AlertDialog.BUTTON_NEGATIVE, "No", (dialog, which) -> {
                     dialog.cancel();
@@ -71,28 +73,27 @@ public class MasterActivity extends AppCompatActivity
     protected boolean loadUserData()
     {
         boolean stayConnected = settings.getBoolean("stayConnected", false);
-        if (stayConnected)
+        FirebaseUser fbUser = refAuth.getCurrentUser();
+
+        if (fbUser == null)
         {
-            String userID = settings.getString("userID", null);
-            if (userID != null && !userID.isEmpty()) {
-                String username = settings.getString("username", "User");
-                connected_user.setUserID(userID);
-                connected_user.setUsername(username);
-                connected_user.setLastLogin(settings.getLong("lastLogin", System.currentTimeMillis()));
-                connected_user.setCreationDate(settings.getLong("creationDate", 0));
-                return true;
-            }
+            isLoggedInThisSession = false;
+            return false;
         }
 
-        // Fallback: Check if there's an active Firebase session even if "remember me" wasn't checked
-        FirebaseUser fbUser = refAuth.getCurrentUser();
-        if (fbUser != null) {
-            connected_user.setUserID(fbUser.getUid());
-            String email = fbUser.getEmail();
-            connected_user.setUsername(email != null ? email.split("@")[0] : "User");
+        if (stayConnected || isLoggedInThisSession)
+        {
+            String userID = settings.getString("userID", fbUser.getUid());
+            String username = settings.getString("username", fbUser.getEmail() != null ? fbUser.getEmail().split("@")[0] : "User");
+            connected_user.setUserID(userID);
+            connected_user.setUsername(username);
+            connected_user.setLastLogin(settings.getLong("lastLogin", System.currentTimeMillis()));
+            connected_user.setCreationDate(settings.getLong("creationDate", 0));
             return true;
         }
 
+        // If we have a Firebase user but 'Remember Me' wasn't checked and it's a new session
+        refAuth.signOut();
         return false;
     }
     protected boolean signout()
@@ -100,6 +101,7 @@ public class MasterActivity extends AppCompatActivity
         try
         {
             refAuth.signOut();
+            isLoggedInThisSession = false;
             connected_user = new User();
             // Clear SharedPreferences
             SharedPreferences.Editor editor = settings.edit();

@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -46,6 +47,13 @@ public class search_screen extends MasterActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_screen);
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed()
+            {
+                finish();
+            }
+        });
 
         recyclerView = findViewById(R.id.rvListItems);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -73,7 +81,10 @@ public class search_screen extends MasterActivity
         }
 
         adapter = new RecycleViewAdapter(searchParameters);
+        adapter.setOnParameterChangedListener(this::updateAddButtonVisibility);
         recyclerView.setAdapter(adapter);
+
+        updateAddButtonVisibility();
     }
 
     // -----------------------------------------------------------------------------------------
@@ -197,7 +208,7 @@ public class search_screen extends MasterActivity
         for (SearchItemParameter p : searchParameters)
         {
             String setting = p.getSetting();
-            if (setting != null && !setting.isEmpty())
+            if (setting != null && !setting.isEmpty() && !setting.equalsIgnoreCase("null") && !setting.equalsIgnoreCase("undefined") && !setting.equalsIgnoreCase("any") && !setting.equalsIgnoreCase("anything"))
             {
                 queryBuilder.append(setting).append(" ");
             }
@@ -352,8 +363,37 @@ public class search_screen extends MasterActivity
     }
 
     public void addItem(View view) {
-        searchParameters.add(new SearchItemParameter("", ""));
+        if (searchParameters.size() >= 8) {
+            Toast.makeText(this, "Maximum 8 attributes allowed", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        searchParameters.add(new SearchItemParameter("", "", true));
         adapter.notifyItemInserted(searchParameters.size() - 1);
+        updateAddButtonVisibility();
+
+        recyclerView.post(() -> recyclerView.smoothScrollToPosition(searchParameters.size() - 1));
+    }
+
+    private void updateAddButtonVisibility() {
+        if (searchParameters == null || searchParameters.isEmpty()) return;
+
+        SearchItemParameter lastItem = searchParameters.get(searchParameters.size() - 1);
+        boolean lastFilled = !lastItem.getAttribute().trim().isEmpty() &&
+                            !lastItem.getSetting().trim().isEmpty();
+
+        // If it's the first item, we only care about the setting (product name is fixed)
+        if (searchParameters.size() == 1) {
+            lastFilled = !lastItem.getSetting().trim().isEmpty();
+        }
+
+        boolean canAdd = lastFilled && searchParameters.size() < 8;
+        int visibility = canAdd ? View.VISIBLE : View.GONE;
+
+        View btnCard = findViewById(R.id.btnAddAttributeCard);
+        View btnBottom = findViewById(R.id.btnAddItemBottom);
+
+        if (btnCard != null) btnCard.setVisibility(visibility);
+        if (btnBottom != null) btnBottom.setVisibility(visibility);
     }
 
     public void searchBtn(View view) {

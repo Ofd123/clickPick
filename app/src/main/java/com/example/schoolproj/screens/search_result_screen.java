@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -31,6 +32,13 @@ public class search_result_screen extends MasterActivity implements AdapterView.
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_result_screen);
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed()
+            {
+                finish();
+            }
+        });
 
         ListView listView = findViewById(R.id.results);
         Intent searchResults = getIntent();
@@ -47,25 +55,37 @@ public class search_result_screen extends MasterActivity implements AdapterView.
             for (int i = 0; i < size; i++) {
                 Product p = results.get(i);
 
-                // ✅ Name
+
                 names[i] = (p.getProduct_name() != null)
                         ? p.getProduct_name()
                         : "Unknown Product";
 
-                // ✅ Price formatting
-                if (p.getPrice() != null && p.getPrice() > 0 )
+                if(p.getPrice() == null)
                 {
-                    prices[i] = String.format("%.2f", p.getPrice()) + "$";
-                } else {
                     prices[i] = "Price unavailable";
                 }
+                else if (!(p.getPrice() > 0))
+                {
+                    prices[i] = "Store page";
+                }
+                else
+                {
+                    prices[i] = String.format("%.2f", p.getPrice()) + "$";
+                }
 
-                // ✅ Store
+//                if (p.getPrice() != null && p.getPrice() > 0 )
+//                {
+//                    prices[i] = String.format("%.2f", p.getPrice()) + "$";
+//                } else {
+//                    prices[i] = "Price unavailable";
+//                }
+
+
                 companies[i] = (p.getStore_name() != null)
                         ? p.getStore_name()
                         : "Unknown Store";
 
-                // ✅ Image
+
                 if (p.getImageUrl() != null &&
                         !p.getImageUrl().isEmpty() &&
                         !p.getImageUrl().equals("null")) {

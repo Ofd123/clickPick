@@ -28,7 +28,7 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:background="#F3F4F6"
-            android:hint="Category"
+            android:hint="Category (such as company)"
             android:paddingHorizontal="16dp"
             android:textSize="14sp" />
 
@@ -47,7 +47,7 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:background="#F3F4F6"
-            android:hint="Electronics"
+            android:hint="example: company name"
             android:paddingHorizontal="16dp"
             android:textSize="14sp" />
 

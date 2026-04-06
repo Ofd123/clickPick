@@ -91,6 +91,7 @@ public class signUp_screen extends MasterActivity
                 {
                     Log.i("SIGNUP_SUCCESS", "createUserWithEmailAndPassword:success");
                     FirebaseUser user = refAuth.getCurrentUser();
+                    isLoggedInThisSession = true;
                     connected_user = new User(user.getUid(), userName);
                     Toast.makeText(signUp_screen.this, "User created successfully.", Toast.LENGTH_SHORT).show();
 

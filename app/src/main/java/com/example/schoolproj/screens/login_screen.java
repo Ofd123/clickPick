@@ -73,6 +73,7 @@ public class login_screen extends MasterActivity
                             // Firebase login was successful
                             Log.d("LOGIN_SUCCESS", "logInWithEmail:success");
                             FirebaseUser fbUser = refAuth.getCurrentUser();
+                            isLoggedInThisSession = true;
 
                             if (rememberMeCB.isChecked())
                             {
