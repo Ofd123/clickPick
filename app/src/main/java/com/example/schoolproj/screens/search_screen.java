@@ -24,6 +24,8 @@ import com.example.schoolproj.classes.Product;
 import com.example.schoolproj.classes.SearchDetails;
 import com.example.schoolproj.classes.SearchItemParameter;
 
+import com.google.firebase.database.DatabaseReference;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -37,7 +39,7 @@ public class search_screen extends MasterActivity
     RecyclerView recyclerView;
     RecycleViewAdapter adapter;
     List<SearchItemParameter> searchParameters;
-    List<Product> results;
+    ArrayList<Product> results;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -57,6 +59,7 @@ public class search_screen extends MasterActivity
         if (json != null) parseInitialSearchDetails(json);
         else
         {
+            @SuppressWarnings("unchecked")
             List<SearchItemParameter> params = (List<SearchItemParameter>) intent.getSerializableExtra("item details");
             if (params != null)
             {
@@ -71,8 +74,6 @@ public class search_screen extends MasterActivity
 
         adapter = new RecycleViewAdapter(searchParameters);
         recyclerView.setAdapter(adapter);
-
-
     }
 
     // -----------------------------------------------------------------------------------------
@@ -103,196 +104,164 @@ public class search_screen extends MasterActivity
         }
         catch (Exception e)
         {
-            Log.e(TAG, "Parse error", e);
+            Log.e(TAG, "Error parsing initial JSON", e);
         }
-    }
-
-    // -----------------------------------------------------------------------------------------
-
-    private boolean isValidStore(String url)
-    {
-        if (url == null) return false;
-
-        url = url.toLowerCase();
-
-
-        if (url.contains("/p/") /* ebay catalog page */ || url.contains("youtube") || url.contains("review"))
-        {
-            return false;
-        }
-
-        //check if it is a real item's url
-        if(url.contains("/itm/") /*ebay real product */ || url.contains("/dp/") /*amazon*/ || url.contains("/product") )
-        {
-            return true;
-        }
-        return false;
-
     }
 
     // -----------------------------------------------------------------------------------------
 
     private void parseGeminiResponse(String response)
     {
-        try {
-            Log.d(TAG, "Gemini RAW: " + response);
-
-            String clean = response.trim()
-                    .replaceAll("```json\\s*", "")
-                    .replaceAll("```\\s*", "")
-                    .trim();
-
-            JSONArray arr = new JSONArray(clean);
+        try
+        {
             results.clear();
+            JSONArray products = null;
 
-            java.util.HashSet<String> seenUrls = new java.util.HashSet<>();
-
-            for (int i = 0; i < arr.length(); i++)
+            String trimmed = response.trim();
+            // Try to parse as array first
+            if (trimmed.startsWith("["))
             {
-                JSONObject obj = arr.getJSONObject(i);
+                products = new JSONArray(trimmed);
+            }
+            else if (trimmed.startsWith("{"))
+            {
+                JSONObject root = new JSONObject(trimmed);
+                products = root.optJSONArray("products");
+            }
 
-                Product p = new Product();
+            if (products == null)
+            {
+                Log.e(TAG, "No valid product array found in Gemini response");
+                return;
+            }
 
-                p.setProduct_name(getSafeString(obj, "product_name"));
-                p.setStore_name(getSafeString(obj, "store_name"));
-                p.setStore_url(getSafeString(obj, "store_url"));
-                p.setStore_location(getSafeString(obj, "store_location"));
-                p.setDescription(getSafeString(obj, "description"));
-                p.setImageUrl(getSafeString(obj, "image"));
-                p.setOther_details(getSafeString(obj, "other_details"));
+            for (int i = 0; i < products.length(); i++)
+            {
+                JSONObject p = products.getJSONObject(i);
 
+                String name = getSafeString(p, "product_name");
+                if (name == null) name = getSafeString(p, "name");
 
-                if (obj.has("price") && !obj.isNull("price"))
+                String priceStr = getSafeString(p, "price");
+                String description = getSafeString(p, "description");
+
+                String url = getSafeString(p, "store_url");
+                if (url == null) url = getSafeString(p, "url");
+
+                String image = getSafeString(p, "image");
+                String storeName = getSafeString(p, "store_name");
+                String storeLocation = getSafeString(p, "store_location");
+                String otherDetails = getSafeString(p, "other_details");
+
+                if (name == null || url == null) continue;
+
+                double price = 0;
+                if (priceStr != null)
                 {
                     try
                     {
-                        p.setPrice(obj.getDouble("price"));
+                        price = Double.parseDouble(priceStr.replaceAll("[^0-9.]", ""));
                     }
-                    catch (Exception e)
-                    {
-                        p.setPrice(null);
-                    }
-                }
-                else
-                {
-                    p.setPrice(null);
+                    catch (Exception ignored) {}
                 }
 
-                //skip broken
-                if (p.getProduct_name() == null || p.getProduct_name().isEmpty()) continue;
-                if (p.getStore_url() == null || p.getStore_url().isEmpty()) continue;
+                String priceType = getSafeString(p, "price_type");
+                if (priceType == null) priceType = "USD"; // Default or logic to extract
 
-                // remove links from the same url
-                if (seenUrls.contains(p.getStore_url()))
-                {
-                    continue;
-                }
-                seenUrls.add(p.getStore_url());
-
-                results.add(p);
+                results.add(new Product(name, price, priceType, image, description, storeName, url, storeLocation, otherDetails));
             }
-
         }
         catch (Exception e)
         {
-            Log.e(TAG, "Parse failed", e);
+            Log.e(TAG, "Error parsing Gemini response", e);
         }
     }
+
     private String getSafeString(JSONObject obj, String key)
     {
         if (!obj.has(key) || obj.isNull(key)) return null;
 
-        String value = obj.optString(key, null);
-
-        if (value == null) return null;
-
+        String value = obj.optString(key, "");
         value = value.trim();
 
-        if (value.equalsIgnoreCase("null") || value.isEmpty())
-            return null;
+        if (value.equalsIgnoreCase("null") || value.isEmpty()) return null;
 
         return value;
     }
 
     // -----------------------------------------------------------------------------------------
 
-    public void searchBtn(View view)
+    public void startSearch(View view)
     {
-        searchParameters = adapter.getParameters();
-
         StringBuilder queryBuilder = new StringBuilder();
-        for (int i = 0; i < searchParameters.size(); i++)
+        for (SearchItemParameter p : searchParameters)
         {
-            String attribute = searchParameters.get(i).getAttribute();
-            String setting = searchParameters.get(i).getSetting();
-
-
-            if (attribute == null || attribute.trim().isEmpty())
+            String setting = p.getSetting();
+            if (setting != null && !setting.isEmpty())
             {
-                continue; //skip empty attributes
+                queryBuilder.append(setting).append(" ");
             }
-            if (setting == null || setting.trim().isEmpty() || setting.equalsIgnoreCase("any") || setting.equalsIgnoreCase("unknown"))
-            {
-                continue; //skip attributes where the user does not want to specify anything
-            }
-
-            queryBuilder.append(setting.trim()).append(" "); //only adding the value (for more accurate result)
         }
-        queryBuilder.append("buy online price"); //add intent booster
 
-        final String query = queryBuilder.toString().trim();
+        String query = queryBuilder.toString().trim();
+
+        if (query.isEmpty())
+        {
+            Toast.makeText(this, "Please enter some search details.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         ProgressDialog pd = new ProgressDialog(this);
-        pd.setTitle("Searching...");
-        pd.setMessage("Finding product pages...");
+        pd.setMessage("Searching the web...");
         pd.setCancelable(false);
         pd.show();
 
+        String finalQuery = query;
         new Thread(() -> {
             try
             {
-                //search
-                JSONArray searchResults = ExaManager.getInstance().search(query);
-
-                //filter urls
-                JSONArray urls = new JSONArray();
-                for (int i = 0; i < searchResults.length(); i++)
+                Log.d(TAG, "Starting search for: " + finalQuery);
+                List<String> urls = ExaManager.getInstance().search(finalQuery);
+                if (urls == null || urls.isEmpty())
                 {
-                    String url = searchResults.getJSONObject(i).optString("url");
-
-                    if (isValidStore(url))
-                    {
-                        urls.put(url);
-                    }
+                    throw new Exception("No search results found for: " + finalQuery);
                 }
 
-                if (urls.length() == 0)
-                    throw new Exception("No valid stores found");
-
-                runOnUiThread(() -> pd.setMessage("Reading product pages..."));
-
-                JSONArray contents = ExaManager.getInstance().getContents(urls);
-
                 StringBuilder text = new StringBuilder();
+                int keptCount = 0;
 
-                for (int i = 0; i < contents.length(); i++)
+                for (String url : urls)
                 {
-                    JSONObject obj = contents.getJSONObject(i);
+                    if (keptCount >= 5) break;
 
-                    String url = obj.optString("url");
-                    String raw = obj.optString("text");
+                    runOnUiThread(() -> pd.setMessage("Reading from " + url + "..."));
 
-                    if (raw == null || raw.length() < 200) continue;
+                    String raw = ExaManager.getInstance().getContents(url);
+                    if (raw == null || raw.isEmpty()) continue;
 
-                    String cleaned = raw
-                            .replaceAll("\\s+", " ")
-                            .replaceAll("(?i)(home|menu|login|signup|cart|footer).*", "");
+                    if (raw.length() < 100) continue;
 
-                    if (cleaned.length() > 4000)
-                        cleaned = cleaned.substring(0, 4000);
+                    String lower = raw.toLowerCase();
+                    if ((lower.contains("robot") && lower.contains("check")) ||
+                            lower.contains("captcha") ||
+                            (lower.contains("access denied") && !lower.contains("product")) ||
+                            lower.contains("please enable cookies"))
+                    {
+                        continue;
+                    }
 
-                    //the url for the product
+                    String cleaned = raw.replaceAll("\\s+", " ");
+                    if (cleaned.length() > 3000)
+                        cleaned = cleaned.substring(0, 3000);
+
                     text.append("SOURCE_URL: ").append(url).append("\n");
                     text.append(cleaned).append("\n\n");
+                    keptCount++;
+                }
+
+                if (text.length() == 0)
+                {
+                    throw new Exception("Could not extract valid product data from the found pages.");
                 }
 
                 runOnUiThread(() -> pd.setMessage("Extracting products..."));
@@ -309,10 +278,10 @@ public class search_screen extends MasterActivity
                             parseGeminiResponse(result);
 
                             if (!results.isEmpty())
-                                finalizeSearch(query);
+                                finalizeSearch(finalQuery);
                             else
                                 Toast.makeText(search_screen.this,
-                                        "No products found", Toast.LENGTH_SHORT).show();
+                                        "No products could be parsed from the search results.", Toast.LENGTH_SHORT).show();
                         });
                     }
 
@@ -322,7 +291,7 @@ public class search_screen extends MasterActivity
                         runOnUiThread(() -> {
                             pd.dismiss();
                             Toast.makeText(search_screen.this,
-                                    "Gemini failed", Toast.LENGTH_SHORT).show();
+                                    "Gemini Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
                         });
                     }
                 });
@@ -330,13 +299,12 @@ public class search_screen extends MasterActivity
             }
             catch (Exception e)
             {
-                Log.e(TAG, "Pipeline failed", e);
-
+                Log.e(TAG, "Search Pipeline Error", e);
                 runOnUiThread(() -> {
                     pd.dismiss();
                     Toast.makeText(search_screen.this,
-                            "Search failed: " + e.getMessage(),
-                            Toast.LENGTH_SHORT).show();
+                            e.getMessage(),
+                            Toast.LENGTH_LONG).show();
                 });
             }
         }).start();
@@ -348,28 +316,47 @@ public class search_screen extends MasterActivity
 
         SearchDetails search = new SearchDetails(query, results);
 
-        if (connected_user != null && connected_user.getUserID() != null) {
-            String uid = connected_user.getUserID();
-            String id = searchHistoryRef.child(uid).push().getKey();
+        // Ensure we have the latest UID directly from Firebase Auth
+        com.google.firebase.auth.FirebaseUser fbUser = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+        String uid = (fbUser != null) ? fbUser.getUid() : (connected_user != null ? connected_user.getUserID() : null);
+
+        if (uid != null)
+        {
+            DatabaseReference newSearchRef = searchHistoryRef.child(uid).push();
+            String id = newSearchRef.getKey();
             search.setSearch_id(id);
 
-            searchHistoryRef.child(uid).child(id).setValue(search);
+            Log.d(TAG, "Attempting to upload search to: " + newSearchRef.toString());
+            Log.d(TAG, "Firebase user: " + fbUser);
+            Log.d(TAG, "Connected user: " + connected_user);
+            Log.d(TAG, "UID: " + uid);
+
+            newSearchRef.setValue(search)
+                    .addOnSuccessListener(aVoid -> Log.d(TAG, "Search history uploaded successfully to: " + newSearchRef.toString()))
+                    .addOnFailureListener(e -> Log.e(TAG, "Search history upload failed: " + e.getMessage()));
+        }
+        else
+        {
+            Log.w(TAG, "Cannot upload search: No authenticated user found.");
+            Toast.makeText(this, "Search not saved: Please sign in.", Toast.LENGTH_SHORT).show();
         }
 
         Intent intent = new Intent(this, search_result_screen.class);
-        intent.putExtra("results", (ArrayList<Product>) results);
+        intent.putExtra("results", results);
         startActivity(intent);
         finish();
     }
 
-    // -----------------------------------------------------------------------------------------
+    public void back(View view) {
+        finish();
+    }
 
     public void addItem(View view) {
-        searchParameters.add(new SearchItemParameter(true));
+        searchParameters.add(new SearchItemParameter("", ""));
         adapter.notifyItemInserted(searchParameters.size() - 1);
     }
 
-    public void back(View view) {
-        finish();
+    public void searchBtn(View view) {
+        startSearch(view);
     }
 }

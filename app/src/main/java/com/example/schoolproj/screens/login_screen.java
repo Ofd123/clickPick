@@ -29,7 +29,7 @@ public class login_screen extends MasterActivity
     Intent loginIntent;
     String userName, password;
     EditText emailED, passwordED;
-    CheckBox rememberMeCB; // It's better to use a CheckBox for this
+    CheckBox rememberMeCB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -38,9 +38,9 @@ public class login_screen extends MasterActivity
         setContentView(R.layout.activity_login_screen);
         loginIntent = getIntent();
 
-        emailED = findViewById(R.id.emailED); // Assuming you have an EditText for email
+        emailED = findViewById(R.id.emailED);
         passwordED = findViewById(R.id.passwordED);
-        rememberMeCB = findViewById(R.id.rememberMeChecked); // Assuming you have a CheckBox
+        rememberMeCB = findViewById(R.id.rememberMeChecked);
 
     }
 
@@ -62,7 +62,8 @@ public class login_screen extends MasterActivity
         progressDialog.show();
 
         refAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>()
+                {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task)
                     {

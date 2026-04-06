@@ -5,61 +5,77 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#F8FAFC"
     android:orientation="vertical"
-    android:padding="16dp"
+    android:padding="24dp"
     tools:context=".screens.search_result_screen">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="2.5"
-        android:orientation="horizontal">
+        android:layout_height="?attr/actionBarSize"
+        android:paddingHorizontal="16dp">
 
-        <Space
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
-
-        <Button
-            android:id="@+id/button"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="12dp"
+            android:src="@drawable/ic_arrow_back"
             android:onClick="home"
-            android:text="home" />
+            app:tint="#1D5673" />
 
-        <Space
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="3" />
-    </LinearLayout>
-
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1" />
+            android:layout_centerInParent="true"
+            android:text="Search Results"
+            android:textColor="#1D5673"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="20"
-        android:orientation="horizontal">
+        android:orientation="vertical"
+        android:paddingHorizontal="24dp"
+        android:paddingTop="24dp">
 
-        <Space
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:text="DISCOVERING EXCELLENCE"
+            android:textColor="#6B7280"
+            android:textSize="12sp"
+            android:letterSpacing="0.1" />
 
-        <ListView
-            android:id="@+id/results"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-        <Space
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_marginTop="4dp">
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Refined Picks"
+                android:textColor="#1A202C"
+                android:textSize="32sp"
+                android:textStyle="bold" />
+
+
+        </RelativeLayout>
     </LinearLayout>
+
+    <ListView
+        android:id="@+id/results"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="16dp"
+        android:paddingHorizontal="16dp"
+        android:divider="@null"
+        android:dividerHeight="16dp"
+        android:clipToPadding="false"
+        android:paddingBottom="24dp" />
 
 </LinearLayout>

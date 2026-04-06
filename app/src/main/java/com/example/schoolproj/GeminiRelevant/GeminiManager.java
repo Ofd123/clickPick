@@ -72,7 +72,7 @@ public class GeminiManager
                 }
                 else
                 {
-                    callback.onSuccess(((GenerateContentResponse) result).getText());
+                    callback.onSuccess(cleanResponse(((GenerateContentResponse) result).getText()));
                 }
             }
         });
@@ -97,9 +97,36 @@ public class GeminiManager
                 }
                 else
                 {
-                    callback.onSuccess(((GenerateContentResponse) result).getText());
+                    callback.onSuccess(cleanResponse(((GenerateContentResponse) result).getText()));
                 }
             }
         });
+    }
+
+    private String cleanResponse(String response) {
+        if (response == null) return null;
+        
+        String cleaned = response.trim();
+        
+        if (cleaned.contains("```")) {
+            int firstIdx = cleaned.indexOf("```");
+            int lastIdx = cleaned.lastIndexOf("```");
+            if (firstIdx != lastIdx) {
+                String content = cleaned.substring(firstIdx + 3, lastIdx).trim();
+                if (content.startsWith("json")) {
+                    content = content.substring(4).trim();
+                }
+                return content;
+            } else if (firstIdx != -1) {
+                // Only one set of backticks, try to strip it if it's at the start
+                if (cleaned.startsWith("```json")) {
+                    return cleaned.substring(7).trim();
+                } else if (cleaned.startsWith("```")) {
+                    return cleaned.substring(3).trim();
+                }
+            }
+        }
+        
+        return cleaned;
     }
 }

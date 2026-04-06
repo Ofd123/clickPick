@@ -5,25 +5,27 @@ import java.io.Serializable;
 
 public class SearchItemParameter implements Serializable
 {
-    String Attribute , setting;
+    String Attribute, setting;
     Boolean isEditable;
 
-    public SearchItemParameter(String searchKey, String searchVal,Boolean isEditable)
+    public SearchItemParameter(String searchKey, String searchVal, Boolean isEditable)
     {
         this.Attribute = searchKey;
         this.setting = searchVal;
         this.isEditable = isEditable;
     }
+
     public SearchItemParameter(String searchKey, String searchVal)
     {
         this.Attribute = searchKey;
         this.setting = searchVal;
         this.isEditable = false;
     }
+
     public SearchItemParameter(Boolean isEditable)
     {
-        this.Attribute = "enter attribute";
-        this.setting = "enter settings";
+        this.Attribute = "";
+        this.setting = "";
         this.isEditable = isEditable;
     }
 
@@ -32,11 +34,9 @@ public class SearchItemParameter implements Serializable
         return isEditable;
     }
 
-
-
     public String getAttribute()
     {
-        return Attribute;
+        return Attribute != null ? Attribute : "";
     }
 
     public void setAttribute(String searchKey) {
@@ -44,7 +44,7 @@ public class SearchItemParameter implements Serializable
     }
 
     public String getSetting() {
-        return setting;
+        return setting != null ? setting : "";
     }
 
     public void setSetting(String setting) {

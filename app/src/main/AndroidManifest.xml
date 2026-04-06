@@ -26,13 +26,19 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
+        android:supportsRtl="false"
         android:theme="@style/Theme.SchoolProj">
+        <activity
+            android:name=".screens.how_to_search_screen"
+            android:exported="false" />
+        <activity
+            android:name=".screens.credits_screen"
+            android:exported="false" />
         <activity
             android:name=".screens.show_all_history_screen"
             android:exported="false" />
         <activity
-            android:name=".screens.signUp_screen$all_search_history_screen"
+            android:name=".screens.signUp_screen"
             android:exported="false" />
         <activity
             android:name=".screens.product_details_screen"
@@ -57,9 +63,6 @@
             android:exported="false" />
         <activity
             android:name=".screens.search_history_screen"
-            android:exported="false" />
-        <activity
-            android:name=".screens.signUp_screen"
             android:exported="false" />
         <activity
             android:name=".screens.login_screen"

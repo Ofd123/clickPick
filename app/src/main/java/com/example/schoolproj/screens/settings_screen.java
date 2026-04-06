@@ -3,6 +3,7 @@ package com.example.schoolproj.screens;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -15,14 +16,32 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.schoolproj.MasterActivity;
 import com.example.schoolproj.R;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 public class settings_screen extends MasterActivity
 {
+    TextView tvSettingsDisplayName;
+    TextView tvSettingsWhenCreated;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+
+        tvSettingsDisplayName = findViewById(R.id.tvSettingsDisplayName);
+        tvSettingsWhenCreated = findViewById(R.id.tvSettingsWhenCreated);
+
+        tvSettingsDisplayName.setText(connected_user.getUsername());
+        
+        SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault());
+        String dateString = sdf.format(new Date(connected_user.getCreationDate()));
+        tvSettingsWhenCreated.setText("Member since: " + dateString);
+
 
     }
 

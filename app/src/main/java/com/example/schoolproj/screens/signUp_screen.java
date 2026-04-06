@@ -3,6 +3,7 @@ package com.example.schoolproj.screens;
 import static com.example.schoolproj.FireBaseFiles.FBRef.refAuth;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -33,7 +35,8 @@ public class signUp_screen extends MasterActivity
 {
     EditText nameED, emailED, passwordED;
     String userName, email, password;
-    CheckBox rememberMeCB, termsOfSrviceCB;
+    CheckBox rememberMeCB, cbTermsOfService;
+    TextView tvTermsOfServiceLink;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -41,10 +44,36 @@ public class signUp_screen extends MasterActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup_screen);
         rememberMeCB = findViewById(R.id.rememberMeChecked);
-        termsOfSrviceCB = findViewById(R.id.termsOfSrviceChecked);
+        cbTermsOfService = findViewById(R.id.cbTermsOfService);
+        tvTermsOfServiceLink = findViewById(R.id.tvTermsOfServiceLink);
         nameED = findViewById(R.id.nameED);
         emailED = findViewById(R.id.emailED);
         passwordED = findViewById(R.id.passwordED);
+
+        tvTermsOfServiceLink.setOnClickListener(v -> showTermsOfServiceDialog());
+    }
+
+    private void showTermsOfServiceDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = getLayoutInflater().inflate(R.layout.terms_of_service_dialog, null);
+        builder.setView(dialogView);
+
+        AlertDialog dialog = builder.create();
+
+        View btnAccept = dialogView.findViewById(R.id.btnAccept);
+        View btnDecline = dialogView.findViewById(R.id.btnDecline);
+
+        btnAccept.setOnClickListener(v -> {
+            cbTermsOfService.setChecked(true);
+            dialog.dismiss();
+        });
+
+        btnDecline.setOnClickListener(v -> {
+            cbTermsOfService.setChecked(false);
+            dialog.dismiss();
+        });
+
+        dialog.show();
     }
 
     public void connect()
@@ -117,19 +146,22 @@ public class signUp_screen extends MasterActivity
 
     public void signUp(View view)
     {
-        if (termsOfSrviceCB.isChecked())
+        //the user would agree to the terms of service once signin in
+        userName = nameED.getText().toString();
+        email = emailED.getText().toString();
+        password = passwordED.getText().toString();
+        if (userName.isEmpty() || email.isEmpty() || password.isEmpty())
         {
-            userName = nameED.getText().toString();
-            email = emailED.getText().toString();
-            password = passwordED.getText().toString();
-            if (userName.isEmpty() || email.isEmpty() || password.isEmpty())
-            {
-                Toast.makeText(this, "please fill all the fields", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            connect();
+            Toast.makeText(this, "please fill all the fields", Toast.LENGTH_SHORT).show();
+            return;
         }
 
+        if (!cbTermsOfService.isChecked()) {
+            Toast.makeText(this, "Please read and accept the Terms of Service", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        connect();
     }
 
 

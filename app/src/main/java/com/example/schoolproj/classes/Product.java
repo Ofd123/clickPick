@@ -13,11 +13,13 @@ public class Product implements Serializable
     String store_url;
     String store_location;
     String other_details;
+    String price_type;
 
-    public Product(String product_name, Double price, String image, String description, String store_name, String store_url, String store_location, String other_details)
+    public Product(String product_name, Double price, String price_type, String image, String description, String store_name, String store_url, String store_location, String other_details)
     {
         this.product_name = product_name;
         this.price = price;
+        this.price_type = price_type;
         this.image_url = image;
         this.description = description;
         this.store_name = store_name;
@@ -31,11 +33,12 @@ public class Product implements Serializable
 
     }
 
-    public Product(String product_id, String product_name, Double price, String description, String image, String store_name, String store_url, String store_location)
+    public Product(String product_id, String product_name, Double price, String price_type, String description, String image, String store_name, String store_url, String store_location)
     {
         this.product_id = product_id;
         this.product_name = product_name;
         this.price = price;
+        this.price_type = price_type;
         this.image_url = image;
         this.description = description;
         this.store_name = store_name;
@@ -110,6 +113,14 @@ public class Product implements Serializable
     public String getOther_details()
     {
         return other_details;
+    }
+
+    public String getPrice_type() {
+        return price_type;
+    }
+
+    public void setPrice_type(String price_type) {
+        this.price_type = price_type;
     }
 
 

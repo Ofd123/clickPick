@@ -27,6 +27,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -77,6 +78,13 @@ public class show_all_history_screen extends MasterActivity implements AdapterVi
                         }
                     }
                 }
+
+                // Sort by date descending (latest first)
+                Collections.sort(historyList, (o1, o2) -> {
+                    if (o1.getSearch_date() == null || o2.getSearch_date() == null) return 0;
+                    return o2.getSearch_date().compareTo(o1.getSearch_date());
+                });
+
                 adp.notifyDataSetChanged();
             }
 

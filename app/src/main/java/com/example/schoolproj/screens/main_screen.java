@@ -3,6 +3,7 @@ package com.example.schoolproj.screens;
 import static android.content.ContentValues.TAG;
 import static com.example.schoolproj.GeminiRelevant.Prompts.GET_DATA_FROM_IMAGE;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -143,14 +144,21 @@ public class main_screen extends MasterActivity
     // ---------------------------------------------------------------------------------------------
     public void openCamera()
     {
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (intent.resolveActivity(getPackageManager()) != null)
+        if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
         {
-            startActivityForResult(intent, Codes.CAMERA_REQUEST_CODE.ordinal());
+            requestPermissions(new String[]{Manifest.permission.CAMERA}, Codes.CAMERA_PERMISSION_CODE.ordinal());
         }
         else
         {
-            Toast.makeText(this, "No camera app found.", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            if (intent.resolveActivity(getPackageManager()) != null)
+            {
+                startActivityForResult(intent, Codes.CAMERA_REQUEST_CODE.ordinal());
+            }
+            else
+            {
+                Toast.makeText(this, "No camera app found.", Toast.LENGTH_SHORT).show();
+            }
         }
     }
     // ---------------------------------------------------------------------------------------------
@@ -230,6 +238,7 @@ public class main_screen extends MasterActivity
     {
         ProgressDialog pd = new ProgressDialog(this);
         pd.setTitle("Analyzing Image...");
+        pd.setCancelable(false);
         pd.show();
 
         String prompt = GET_DATA_FROM_IMAGE;
@@ -300,6 +309,12 @@ public class main_screen extends MasterActivity
     public void goToSettings(View view)
     {
         Intent intent = new Intent(this, settings_screen.class);
+        startActivity(intent);
+    }
+
+    public void credits(View view)
+    {
+        Intent intent = new Intent(this, credits_screen.class);
         startActivity(intent);
     }
 }

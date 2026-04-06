@@ -134,45 +134,47 @@ public class Prompts
                     "\n" +
                     "**Current Request:**\n";
 
-    public static String SEARCH_PROMPT =  "Extract product listings from the text below.\n\n" +
+    public static String SEARCH_PROMPT =  "Extract all valid product listings from the provided text.\n\n" +
 
-            "Return a JSON array of up to 15-20 products.\n\n" +
+            "Your goal is to find as many matching products as possible (aim for 15-20 results if the text allows).\n\n" +
+
+            "CRITICAL CATEGORY RULE:\n" +
+            "- You must strictly adhere to the requested product category.\n" +
+            "- If the user is looking for a 'phone', DO NOT return tablets, smartwatches, or cases, even if they appear in the same search results.\n" +
+            "- Filter out accessories, parts (like 'replacement screen'), or related but incorrect devices.\n\n" +
 
             "Rules:\n" +
-            "- Include multiple results from different stores\n" +
-            "- Prefer full products (NOT parts like 'left earbud only', 'case only')\n" +
-            "- Avoid duplicates (same product + same store)\n" +
-            "- Keep results diverse (different sellers, prices, conditions)\n" +
-            "- DO NOT invent data\n\n" +
+            "- Include multiple results from different stores.\n" +
+            "- If a single page lists multiple sellers or variations, include each unique offer as a separate result.\n" +
+            "- Prefer full products (NOT parts like 'left earbud only', 'charging case only').\n" +
+            "- Keep results diverse (different sellers, conditions).\n" +
+            "- DO NOT invent data. If information is missing from the text, use null.\n\n" +
 
             "DESCRIPTION RULE (VERY IMPORTANT):\n" +
-            "- The description MUST be based ONLY on the given text\n" +
-            "- Extract key features (brand, model, condition, specs)\n" +
-            "- Write a clear summary of the product\n" +
-            "- DO NOT leave description null if any info exists\n" +
-            "- DO NOT make up features that are not in the text\n\n" +
+            "- The description MUST be based ONLY on the given text.\n" +
+            "- Extract key features (brand, model, condition, specs).\n" +
+            "- Write a clear summary of the product.\n" +
+            "- DO NOT leave description null if any info exists.\n" +
+            "- DO NOT make up features that are not in the text.\n\n" +
 
             "Output format (STRICT JSON ONLY):\n" +
             "[\n" +
             "{\n" +
             "  \"product_name\": string,\n" +
-            "  \"price\": number, base the price only from the text and do not make up the price,\n" +
-            "  \"image\": string or null,\n" +
-            "  \"description\": string or null,\n" +
+            "  \"price\": number, the product's original price AND NOT WITH PROMOTION OR WITH THE SALE (extract numeric value only, e.g. 599.99),\n" +
+            "  \"image\": string or null (URL for the product image),\n" +
+            "  \"description\": all of the data that you can gather from the site regarding to that product (string or null),\n" +
             "  \"store_name\": string,\n" +
             "  \"store_url\": string,\n" +
             "  \"store_location\": string or null,\n" +
-            "  \"other_details\": string or null\n" +
+            "  \"other_details\": string or null (mention currency here, e.g. 'Price in USD', shipping info, etc.)\n" +
             "}\n" +
             "]\n\n" +
 
             "Important:\n" +
-            "- Return ONLY JSON (no explanation)\n" +
-            "- Clean messy text\n" +
-            "- If field missing → null\n\n" +
+            "- Return ONLY JSON (no explanation, no markdown blocks).\n" +
+            "- Clean messy text before extracting.\n" +
+            "- If a product is mentioned multiple times with different prices, include each unique offer.\n\n" +
 
             "TEXT:\n" ;
-
-
-
 }

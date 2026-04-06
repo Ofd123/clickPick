@@ -1,27 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="16dp"
-    android:orientation="vertical">
+    android:layout_marginBottom="16dp"
 
-    <EditText
-        android:id="@+id/itemAttributeED"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp">
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="enter attribute"
-        android:inputType="text"
-        android:enabled="false"
-        tools:ignore="TouchTargetSizeCheck" />
+        android:orientation="vertical"
+        android:padding="20dp">
 
-    <EditText
-        android:id="@+id/itemSettingED"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="text"
-        android:hint = "enter settings"
-        tools:ignore="TouchTargetSizeCheck"
-        />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:text="ATTRIBUTE NAME"
+            android:textColor="#4B5563"
+            android:textSize="11sp"
+            android:textStyle="bold" />
 
-</LinearLayout>
+        <EditText
+            android:id="@+id/itemAttributeED"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="#F3F4F6"
+            android:hint="Category"
+            android:paddingHorizontal="16dp"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="6dp"
+            android:text="ATTRIBUTE VALUE"
+            android:textColor="#4B5563"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/itemSettingED"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="#F3F4F6"
+            android:hint="Electronics"
+            android:paddingHorizontal="16dp"
+            android:textSize="14sp" />
+
+        <ImageView
+            android:id="@+id/deleteBtn"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="end"
+            android:layout_marginTop="12dp"
+            android:src="@android:drawable/ic_menu_delete"
+            app:tint="#9CA3AF" />
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

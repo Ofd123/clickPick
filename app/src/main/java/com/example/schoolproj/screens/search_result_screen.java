@@ -1,7 +1,10 @@
 package com.example.schoolproj.screens;
 
+import static android.content.ContentValues.TAG;
+
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -50,8 +53,9 @@ public class search_result_screen extends MasterActivity implements AdapterView.
                         : "Unknown Product";
 
                 // ✅ Price formatting
-                if (p.getPrice() != null) {
-                    prices[i] = "$" + String.format("%.2f", p.getPrice());
+                if (p.getPrice() != null && p.getPrice() > 0 )
+                {
+                    prices[i] = String.format("%.2f", p.getPrice()) + "$";
                 } else {
                     prices[i] = "Price unavailable";
                 }

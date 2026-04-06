@@ -1,6 +1,246 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_marginBottom="20dp">
+
+        <ImageView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="#E1F1F8"
+            android:padding="10dp"
+            android:src="@android:drawable/ic_menu_edit"
+            app:tint="#1D5673" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Terms of Service"
+                android:textColor="#1A202C"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Last updated: October 24, 2023"
+                android:textColor="#718096"
+                android:textSize="12sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fadeScrollbars="false">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- 1 -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="1. Agreement to Terms"
+                android:textColor="#1A202C"
+                android:textStyle="bold"
+                android:textSize="15sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="20dp"
+                android:text="By accessing ClickPick, you agree to these terms. Our service provides a product discovery and comparison experience."
+                android:textColor="#4A5568"
+                android:lineSpacingExtra="4dp" />
+
+            <!-- 2 -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="2. Visual Search Technology"
+                android:textColor="#1A202C"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:layout_marginTop="16dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="We utilize AI and web data extraction technologies to identify and display products. Results are for informational purposes only."
+                android:textColor="#4A5568"
+                android:lineSpacingExtra="4dp" />
+
+            <!-- note -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="16dp"
+                android:background="#F1F5F9"
+                android:padding="12dp"
+                android:text="Note: High-quality input improves search accuracy."
+                android:textColor="#1D5673"
+                android:textSize="13sp"
+                android:textStyle="italic" />
+
+            <!-- 3 -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="3. User Conduct &amp; Privacy"
+                android:textColor="#1A202C"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:layout_marginTop="16dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="You are responsible for the content you provide. We process data to improve the service while maintaining reasonable security practices."
+                android:textColor="#4A5568"
+                android:lineSpacingExtra="4dp" />
+
+            <!-- 4 -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="4. Third-Party Content"
+                android:textColor="#1A202C"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:layout_marginTop="16dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="ClickPick aggregates data from third-party websites. We do not guarantee accuracy, pricing, availability, or completeness of product information."
+                android:textColor="#4A5568"
+                android:lineSpacingExtra="4dp" />
+
+            <!-- 5 -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="5. External Links"
+                android:textColor="#1A202C"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:layout_marginTop="16dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Our service may link to third-party websites. We are not responsible for their content or services. Any transactions are solely between you and the third-party."
+                android:textColor="#4A5568"
+                android:lineSpacingExtra="4dp" />
+
+            <!-- 6 -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="6. Purchases Disclaimer"
+                android:textColor="#1A202C"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:layout_marginTop="16dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="ClickPick does not sell products. We are not responsible for payments, shipping, returns, or product quality."
+                android:textColor="#4A5568"
+                android:lineSpacingExtra="4dp" />
+
+            <!-- 7 -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="7. AI Disclaimer"
+                android:textColor="#1A202C"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:layout_marginTop="16dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Some product data is generated or processed using AI. Information may contain inaccuracies or missing details."
+                android:textColor="#4A5568"
+                android:lineSpacingExtra="4dp" />
+
+            <!-- 8 -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="8. Service Availability"
+                android:textColor="#1A202C"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:layout_marginTop="16dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="We do not guarantee uninterrupted service. Features may change or be discontinued at any time."
+                android:textColor="#4A5568"
+                android:lineSpacingExtra="4dp" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnDecline"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="12dp"
+            android:backgroundTint="#EDF2F7"
+            android:text="Decline"
+            android:textColor="#1D5673"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnAccept"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_weight="1.2"
+            android:backgroundTint="#005A8D"
+            android:text="Accept &amp; Continue"
+            android:textColor="@android:color/white"
+            android:textStyle="bold" />
+    </LinearLayout>
 
 </LinearLayout>
