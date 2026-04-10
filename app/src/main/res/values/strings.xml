@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SchoolProj</string>
+    <string name="app_name">ClickPick</string>
     <string name="already_have_an_account">already have an account?</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
