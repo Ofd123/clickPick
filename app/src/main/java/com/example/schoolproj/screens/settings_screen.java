@@ -21,13 +21,25 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+/**
+ * Activity for managing user settings and profile overview.
+ * Displays the user's display name and account creation date.
+ * Provides functionality to sign out of the application.
+ */
 public class settings_screen extends MasterActivity
 {
+    /** TextView to display the user's username. */
     TextView tvSettingsDisplayName;
+    /** TextView to display the account creation timestamp. */
     TextView tvSettingsWhenCreated;
 
-
-
+    /**
+     * Called when the activity is starting.
+     * Initializes UI components and populates user profile data from the session.
+     * @param savedInstanceState If the activity is being re-initialized after
+     *                           previously being shut down then this Bundle contains the data it most
+     *                           recently supplied in onSaveInstanceState(Bundle).
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -53,13 +65,20 @@ public class settings_screen extends MasterActivity
 
     }
 
+    /**
+     * UI callback for the back button to close the activity.
+     * @param view The view that was clicked.
+     */
     public void back(View view)
     {
         finish();
     }
 
-
-
+    /**
+     * Initiates the sign-out process.
+     * Displays a confirmation dialog before clearing the session and closing the activity.
+     * @param view The view that was clicked (Sign Out button).
+     */
     public void signOut(View view)
     {
         AlertDialog.Builder secondChance = new AlertDialog.Builder(this);
@@ -92,6 +111,4 @@ public class settings_screen extends MasterActivity
         });
         secondChance.show();
     }
-
-
-}
+}

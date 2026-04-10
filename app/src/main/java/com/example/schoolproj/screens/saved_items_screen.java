@@ -24,12 +24,26 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Activity for displaying the list of items saved/favorited by the user.
+ * Feeds data from Firebase Realtime Database into a ListView using a SearchResultsAdapter.
+ */
 public class saved_items_screen extends MasterActivity implements AdapterView.OnItemClickListener {
 
+    /** UI element for displaying the list of saved products. */
     private ListView listView;
+    /** Adapter for mapping product data to ListView items. */
     private SearchResultsAdapter adapter;
+    /** Local list of products retrieved from Firebase. */
     private List<Product> savedProducts;
 
+    /**
+     * Called when the activity is starting.
+     * Initializes UI components and triggers data loading if a user is logged in.
+     * @param savedInstanceState If the activity is being re-initialized after
+     *                           previously being shut down then this Bundle contains the data it most
+     *                           recently supplied in onSaveInstanceState(Bundle).
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -56,6 +70,10 @@ public class saved_items_screen extends MasterActivity implements AdapterView.On
         }
     }
 
+    /**
+     * Attaches a listener to the Firebase 'favorites' node for the current user.
+     * Updates the local list and refreshes the UI whenever data changes.
+     */
     private void loadSavedItems()
     {
         String userID = connected_user.getUserID();
@@ -82,6 +100,11 @@ public class saved_items_screen extends MasterActivity implements AdapterView.On
             }
         });
     }
+
+    /**
+     * Extracts display data (names, prices, companies, images) from the saved products
+     * and initializes the SearchResultsAdapter for the ListView.
+     */
     private void updateList()
     {
         int size = savedProducts.size();
@@ -111,10 +134,22 @@ public class saved_items_screen extends MasterActivity implements AdapterView.On
         listView.setAdapter(resultsAdp);
     }
 
+    /**
+     * UI callback for the home/back button to close the activity.
+     * @param view The view that was clicked.
+     */
     public void home(View view) {
         finish();
     }
 
+    /**
+     * Callback for when an item in the ListView is clicked.
+     * Transitions to the product details screen for the selected item.
+     * @param parent The AdapterView where the click happened.
+     * @param view The view within the AdapterView that was clicked.
+     * @param position The position of the view in the adapter.
+     * @param id The row id of the item that was clicked.
+     */
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id)
     {

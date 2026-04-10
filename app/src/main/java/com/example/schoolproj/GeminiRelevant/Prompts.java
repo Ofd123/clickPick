@@ -1,12 +1,23 @@
 package com.example.schoolproj.GeminiRelevant;
 
+/**
+ * Utility class containing various prompt templates for Gemini AI and Exa.ai search.
+ * Each constant defines a specific instruction set for the AI models.
+ */
 public class Prompts
 {
+    /**
+     * Prompt for analyzing an image to extract product details in a JSON format.
+     */
     public static final String GET_DATA_FROM_IMAGE = "Analyze the item in the image. " +
             "Return a JSON object with the following structure: " +
             "{ \"item\": \"short product name\", \"settings\": { \"brand\": \"...\", \"color\": \"...\", \"model\": \"...\" } }. " +
             "Return ONLY the raw JSON without markdown formatting.";
 
+    /**
+     * Detailed prompt for performing a price comparison search across multiple stores.
+     * Instructs the AI to act as an expert procurement assistant and return structured JSON results.
+     */
     public static String SEARCH_ITEM_FOR_PRICE_COMPARE =
             "**Role:**\n" +
             "You are an Expert e-Commerce Procurement Assistant specialized in finding the best deals online. Your goal is to locate specific products across reputable online stores and structured data extraction.\n" +
@@ -42,6 +53,11 @@ public class Prompts
             "}\n" +
             "\n" +
             "**Input Product Details:**\n";
+
+    /**
+     * Prompt for finding relevant products from trusted e-commerce sources.
+     * Includes strict rules against hallucination and category matching.
+     */
     public static String SEARCH_ITEMS_RELEVANT =
 
             "**Role:**\n" +
@@ -134,6 +150,10 @@ public class Prompts
                     "\n" +
                     "**Current Request:**\n";
 
+    /**
+     * Prompt for extracting product listings from large chunks of web text.
+     * Focuses on diversity of results and strict category adherence.
+     */
     public static String SEARCH_PROMPT =  "Extract all valid product listings from the provided text.\n\n" +
 
             "Your goal is to find as many matching products as possible (aim for 15-20 results if the text allows).\n\n" +

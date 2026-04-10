@@ -24,9 +24,23 @@ import com.example.schoolproj.classes.Product;
 
 import java.util.ArrayList;
 
+/**
+ * Activity for displaying the results of a product search.
+ * Shows a list of products with their names, prices, and store information.
+ * Users can click on an item to see more details.
+ */
 public class search_result_screen extends MasterActivity implements AdapterView.OnItemClickListener {
 
+    /** The list of products returned by the search. */
     ArrayList<Product> results;
+
+    /**
+     * Called when the activity is starting.
+     * Initializes the ListView and fills it with results passed via the intent.
+     * @param savedInstanceState If the activity is being re-initialized after
+     *                           previously being shut down then this Bundle contains the data it most
+     *                           recently supplied in onSaveInstanceState(Bundle).
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -56,9 +70,11 @@ public class search_result_screen extends MasterActivity implements AdapterView.
                 Product p = results.get(i);
 
 
-                names[i] = (p.getProduct_name() != null)
-                        ? p.getProduct_name()
-                        : "Unknown Product";
+                if (p.getProduct_name() != null) {
+                    names[i] = p.getProduct_name();
+                } else {
+                    names[i] = "Unknown Product";
+                }
 
                 if(p.getPrice() == null)
                 {
@@ -73,17 +89,12 @@ public class search_result_screen extends MasterActivity implements AdapterView.
                     prices[i] = String.format("%.2f", p.getPrice()) + "$";
                 }
 
-//                if (p.getPrice() != null && p.getPrice() > 0 )
-//                {
-//                    prices[i] = String.format("%.2f", p.getPrice()) + "$";
-//                } else {
-//                    prices[i] = "Price unavailable";
-//                }
 
-
-                companies[i] = (p.getStore_name() != null)
-                        ? p.getStore_name()
-                        : "Unknown Store";
+                if (p.getStore_name() != null) {
+                    companies[i] = p.getStore_name();
+                } else {
+                    companies[i] = "Unknown Store";
+                }
 
 
                 if (p.getImageUrl() != null &&
@@ -102,6 +113,14 @@ public class search_result_screen extends MasterActivity implements AdapterView.
         }
     }
 
+    /**
+     * Callback for when a result item is clicked.
+     * Transitions to the product details screen for the selected item.
+     * @param adapterView The AdapterView where the click happened.
+     * @param view The view within the AdapterView that was clicked.
+     * @param pos The position of the view in the adapter.
+     * @param rowId The row id of the item that was clicked.
+     */
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int pos, long rowId)
     {
@@ -112,14 +131,12 @@ public class search_result_screen extends MasterActivity implements AdapterView.
         startActivity(productDetails);
     }
 
-    @Override
-    public void onPointerCaptureChanged(boolean hasCapture)
-    {
-        super.onPointerCaptureChanged(hasCapture);
-    }
-
+    /**
+     * UI callback for the home button to close the activity.
+     * @param view The view that was clicked.
+     */
     public void home(View view)
     {
         finish();
     }
-}
+}

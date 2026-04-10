@@ -31,13 +31,28 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
+/**
+ * Activity for displaying detailed information about a specific product.
+ * Allows users to view product images, names, prices, and direct store links.
+ * Also provides functionality to save or remove products from the user's favorites in Firebase.
+ */
 public class product_details_screen extends AppCompatActivity
 {
-
+    /** The specific product being detailed in this screen. */
     private Product product;
+    /** The database key for this product if it's already saved in favorites; null otherwise. */
     private String favoriteKey = null;
+    /** UI element for saving or removing from favorites. */
     private ImageView saveBtn;
 
+    /**
+     * Called when the activity is starting.
+     * Initializes UI elements, retrieves product data from the intent, and checks if it's a favorite.
+     * Sets up link builders for the store URL.
+     * @param savedInstanceState If the activity is being re-initialized after
+     *                           previously being shut down then this Bundle contains the data it most
+     *                           recently supplied in onSaveInstanceState(Bundle).
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -122,12 +137,15 @@ public class product_details_screen extends AppCompatActivity
                         .setTextColorOfHighlightedLink(Color.CYAN)
                         .setUnderlined(true)
                         .setBold(true)
-                        .setOnClickListener(url -> {
-                            if (!url.startsWith("http://") && !url.startsWith("https://")) {
-                                url = "https://" + url;
+                        .setOnClickListener(new Link.OnClickListener() {
+                            @Override
+                            public void onClick(String url) {
+                                if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                                    url = "https://" + url;
+                                }
+                                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                                startActivity(intent);
                             }
-                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                            startActivity(intent);
                         });
 
                 LinkBuilder.on(extraData)
@@ -142,11 +160,20 @@ public class product_details_screen extends AppCompatActivity
         }
     }
 
+    /**
+     * UI callback for the back button to close the activity.
+     * @param view The view that was clicked.
+     */
     public void back(View view)
     {
         finish();
     }
 
+    /**
+     * UI callback to save or remove the product from the user's favorites in Firebase.
+     * Checks if the user is authenticated before performing database operations.
+     * @param view The view that was clicked (Save/Star button).
+     */
     public void save(View view) //saves or removes the product from the user's firebase
     {
         FirebaseUser user = refAuth.getCurrentUser();
@@ -159,24 +186,38 @@ public class product_details_screen extends AppCompatActivity
                 String savedItemKey = favoritesRef.child(uid).push().getKey();
                 if (savedItemKey != null) {
                     favoritesRef.child(uid).child(savedItemKey).setValue(product)
-                        .addOnSuccessListener(aVoid -> {
-                            favoriteKey = savedItemKey;
-                            updateSaveButtonIcon();
-                            Toast.makeText(product_details_screen.this, "Product saved to favorites!", Toast.LENGTH_SHORT).show();
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                favoriteKey = savedItemKey;
+                                updateSaveButtonIcon();
+                                Toast.makeText(product_details_screen.this, "Product saved to favorites!", Toast.LENGTH_SHORT).show();
+                            }
                         })
-                        .addOnFailureListener(e -> Toast.makeText(product_details_screen.this, "Failed to save: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(product_details_screen.this, "Failed to save: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
                 }
             } else {
                 // Already a favorite, so REMOVE it
                 favoritesRef.child(uid).child(favoriteKey).removeValue()
-                    .addOnSuccessListener(aVoid -> {
-                        favoriteKey = null;
-                        updateSaveButtonIcon();
-                        
-                        Toast.makeText(product_details_screen.this, "Removed from favorites", Toast.LENGTH_SHORT).show();
-
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            favoriteKey = null;
+                            updateSaveButtonIcon();
+                            Toast.makeText(product_details_screen.this, "Removed from favorites", Toast.LENGTH_SHORT).show();
+                        }
                     })
-                    .addOnFailureListener(e -> Toast.makeText(product_details_screen.this, "Failed to remove: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(product_details_screen.this, "Failed to remove: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
             }
         }
         else
@@ -185,6 +226,10 @@ public class product_details_screen extends AppCompatActivity
         }
     }
 
+    /**
+     * Queries Firebase to check if the current product is already in the user's favorites.
+     * Updates favoriteKey and the save button icon accordingly.
+     */
     private void checkIfFavorite() {
         FirebaseUser user = refAuth.getCurrentUser();
         if (user == null || product == null) return;
@@ -209,6 +254,9 @@ public class product_details_screen extends AppCompatActivity
         });
     }
 
+    /**
+     * Updates the save button image depending on whether the product is a favorite (full star vs empty star).
+     */
     private void updateSaveButtonIcon() {
         if (saveBtn != null)
         {

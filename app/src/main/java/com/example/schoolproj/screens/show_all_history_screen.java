@@ -35,12 +35,27 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+/**
+ * Activity for displaying a unified view of all unique searches in the application.
+ * Aggregates search history across all users from Firebase and displays it in a ListView.
+ * Filters duplicate queries and sorts them by date.
+ */
 public class show_all_history_screen extends MasterActivity implements AdapterView.OnItemClickListener
 {
+    /** ListView for displaying the aggregated search history. */
     ListView History;
+    /** Local list of unique SearchDetails aggregated from all users. */
     List<SearchDetails> historyList;
+    /** Custom adapter for search history items. */
     CustomAdapter adp;
 
+    /**
+     * Called when the activity is starting.
+     * Initializes UI components and triggers the aggregator logic.
+     * @param savedInstanceState If the activity is being re-initialized after
+     *                           previously being shut down then this Bundle contains the data it most
+     *                           recently supplied in onSaveInstanceState(Bundle).
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -64,6 +79,10 @@ public class show_all_history_screen extends MasterActivity implements AdapterVi
         loadAllSearchHistory();
     }
 
+    /**
+     * Queries the entire 'SearchHistory' node from Firebase.
+     * Iterates through all users, collects unique search queries, and sorts them latest-first.
+     */
     private void loadAllSearchHistory()
     {
         searchHistoryRef.addValueEventListener(new ValueEventListener() {
@@ -88,9 +107,14 @@ public class show_all_history_screen extends MasterActivity implements AdapterVi
                 }
 
                 // Sort by date descending (latest first)
-                Collections.sort(historyList, (o1, o2) -> {
-                    if (o1.getSearch_date() == null || o2.getSearch_date() == null) return 0;
-                    return o2.getSearch_date().compareTo(o1.getSearch_date());
+                Collections.sort(historyList, new java.util.Comparator<SearchDetails>() {
+                    @Override
+                    public int compare(SearchDetails o1, SearchDetails o2) {
+                        if (o1.getSearch_date() == null || o2.getSearch_date() == null) {
+                            return 0;
+                        }
+                        return o2.getSearch_date().compareTo(o1.getSearch_date());
+                    }
                 });
 
                 adp.notifyDataSetChanged();
@@ -104,19 +128,39 @@ public class show_all_history_screen extends MasterActivity implements AdapterVi
         });
     }
 
+    /**
+     * UI callback for the home button to close the activity.
+     * @param view The view that was clicked.
+     */
     public void home(View view)
     {
         finish();
     }
 
+    /**
+     * Custom ArrayAdapter for displaying search records from multiple users.
+     */
     private class CustomAdapter extends ArrayAdapter<SearchDetails>
     {
+        /** Formatter for displaying the search date. */
         private final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm • dd/MM/yy", Locale.getDefault());
 
+        /**
+         * Constructor for CustomAdapter.
+         * @param context Current context.
+         * @param objects List of search records to display.
+         */
         public CustomAdapter(@NonNull Context context, @NonNull List<SearchDetails> objects) {
             super(context, 0, objects);
         }
 
+        /**
+         * Renders the view for a search history item.
+         * @param position Position in list.
+         * @param convertView Recycled view.
+         * @param parent Parent ViewGroup.
+         * @return The rendered view.
+         */
         @NonNull
         @Override
         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent)
@@ -136,7 +180,14 @@ public class show_all_history_screen extends MasterActivity implements AdapterVi
                 tvSearchQuery.setText(currentSearch.getSearch_query());
                 
                 String dateStr = dateFormat.format(new Date(currentSearch.getSearch_date()));
-                String type = (currentSearch.getCompare_price() != null && currentSearch.getCompare_price()) ? "Comparison" : "Keyword";
+                
+                String type;
+                if (currentSearch.getCompare_price() != null && currentSearch.getCompare_price()) {
+                    type = "Comparison";
+                } else {
+                    type = "Keyword";
+                }
+                
                 tvSearchDetails.setText(dateStr + " • " + type);
             }
 
@@ -144,6 +195,14 @@ public class show_all_history_screen extends MasterActivity implements AdapterVi
         }
     }
 
+    /**
+     * Callback for when an aggregated history item is clicked.
+     * Displays the results associated with that particular search.
+     * @param parent The AdapterView.
+     * @param view The clicked view.
+     * @param position Position in list.
+     * @param id Row ID.
+     */
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id)
     {

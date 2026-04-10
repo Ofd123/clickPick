@@ -30,13 +30,29 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
+/**
+ * The main dashboard Activity of the application.
+ * Provides entry points for regular search, image search, history, favorites, and settings.
+ * Handles image capture/selection and initiates AI-powered image analysis via Gemini.
+ */
 public class main_screen extends MasterActivity
 {
+    /** Manager for interacting with the Gemini AI model. */
     GeminiManager geminiManager;
+    /** JSON object to store extracted search details from an image. */
     JSONObject searchDetails;
+    /** Pre-initialized intents for the authentication flow. */
     Intent signinIntent, loginIntent;
+    /** Flag to prevent redundant data loading during auth redirects. */
     private boolean isAuthRedirecting = false;
 
+    /**
+     * Called when the activity is starting.
+     * Initializes the Gemini manager and authentication intents.
+     * @param savedInstanceState If the activity is being re-initialized after
+     *                           previously being shut down then this Bundle contains the data it most
+     *                           recently supplied in onSaveInstanceState(Bundle).
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -51,6 +67,10 @@ public class main_screen extends MasterActivity
         loginIntent = new Intent(this, login_screen.class);
     }
 
+    /**
+     * Called when the activity will start interacting with the user.
+     * Triggers data loading and authentication checks.
+     */
     @Override
     protected void onResume()
     {
@@ -64,6 +84,9 @@ public class main_screen extends MasterActivity
         isAuthRedirecting = false;
     }
 
+    /**
+     * Loads user data and redirects to sign-in if no user is authenticated.
+     */
     void loadData()
     {
         if (!loadUserData())
@@ -72,13 +95,19 @@ public class main_screen extends MasterActivity
         }
     }
 
-    // ---------------------------------------------------------------------------------------------
+    /**
+     * UI callback to start a regular text-based search.
+     * @param view The view that was clicked.
+     */
     public void regularSearch(View view)
     {
         Intent intent = new Intent(this, search_screen.class);
         startActivityForResult(intent, Codes.SEARCH_REQUEST_CODE.ordinal());
     }
-    // ---------------------------------------------------------------------------------------------
+
+    /**
+     * Displays an alert warning the user about image quality for searches.
+     */
     public void showAlert()
     {
         AlertDialog.Builder secondChance = new AlertDialog.Builder(this);
@@ -103,12 +132,19 @@ public class main_screen extends MasterActivity
         });
         secondChance.show();
     }
-    // ---------------------------------------------------------------------------------------------
+
+    /**
+     * UI callback to start an image-based search.
+     * @param view The view that was clicked.
+     */
     public void imageSearch(View view)
     {
         showAlert();
     }
 
+    /**
+     * Opens a dialog for the user to select between Camera or Gallery.
+     */
     private void selectImageSource()
     {
         try
@@ -117,22 +153,28 @@ public class main_screen extends MasterActivity
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Select Image Source");
-            builder.setItems(options, (dialog, which) -> {
-                switch (which)
-                {
-                    case 0:
-                        openCamera();
-                        dialog.dismiss();
-                        break;
-                    case 1:
-                        openGallery();
-                        dialog.dismiss();
-                        break;
+            builder.setItems(options, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    switch (which)
+                    {
+                        case 0:
+                            openCamera();
+                            dialog.dismiss();
+                            break;
+                        case 1:
+                            openGallery();
+                            dialog.dismiss();
+                            break;
+                    }
                 }
             });
 
-            builder.setOnCancelListener(dialog -> {
-                Toast.makeText(main_screen.this, "Image selection cancelled.", Toast.LENGTH_SHORT).show();
+            builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    Toast.makeText(main_screen.this, "Image selection cancelled.", Toast.LENGTH_SHORT).show();
+                }
             });
             builder.create().show();
         }
@@ -141,7 +183,10 @@ public class main_screen extends MasterActivity
             Log.e(TAG, "selectImageSource error: " + e.getMessage());
         }
     }
-    // ---------------------------------------------------------------------------------------------
+
+    /**
+     * Requests camera permission if needed and opens the camera application.
+     */
     public void openCamera()
     {
         if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
@@ -161,7 +206,10 @@ public class main_screen extends MasterActivity
             }
         }
     }
-    // ---------------------------------------------------------------------------------------------
+
+    /**
+     * Opens the device gallery to pick an image.
+     */
     public void openGallery()
     {
         try
@@ -174,7 +222,13 @@ public class main_screen extends MasterActivity
             Log.e("Error", e.toString());
         }
     }
-    // ---------------------------------------------------------------------------------------------
+
+    /**
+     * Processes results from various activities (Auth, Camera, Gallery).
+     * @param requestCode The integer request code originally supplied to startActivityForResult().
+     * @param resultCode The integer result code returned by the child activity through its setResult().
+     * @param data An Intent, which can return result data to the caller.
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
@@ -185,7 +239,12 @@ public class main_screen extends MasterActivity
             // Handle Login/Signup flow
             if (requestCode == Codes.SIGN_IN.ordinal() || requestCode == Codes.LOG_IN.ordinal())
             {
-                int state = data != null ? data.getIntExtra("state", Codes.ERROR.ordinal()) : Codes.ERROR.ordinal();
+                int state;
+                if (data != null) {
+                    state = data.getIntExtra("state", Codes.ERROR.ordinal());
+                } else {
+                    state = Codes.ERROR.ordinal();
+                }
 
                 if (state == Codes.LOG_IN.ordinal())
                 {
@@ -200,7 +259,14 @@ public class main_screen extends MasterActivity
                 else if (state == Codes.REMEMBER_ME.ordinal())
                 {
                     loadUserData(); // Refresh user from SharedPreferences
-                    Toast.makeText(this, "Welcome " + (connected_user != null ? connected_user.getUsername() : ""), Toast.LENGTH_SHORT).show();
+                    String welcomeMsg = "Welcome ";
+                    if (connected_user != null) {
+                        String username = connected_user.getUsername();
+                        if (username != null) {
+                            welcomeMsg += username;
+                        }
+                    }
+                    Toast.makeText(this, welcomeMsg, Toast.LENGTH_SHORT).show();
                 }
                 return;
             }
@@ -234,6 +300,11 @@ public class main_screen extends MasterActivity
         }
     }
 
+    /**
+     * Sends the captured/selected bitmap to Gemini for product extraction.
+     * Transitions to the search screen upon successful analysis.
+     * @param imageBitmap The bitmap to analyze.
+     */
     private void analyzeImage(Bitmap imageBitmap)
     {
         ProgressDialog pd = new ProgressDialog(this);
@@ -273,6 +344,12 @@ public class main_screen extends MasterActivity
         }
     }
 
+    /**
+     * Handles the results of permission requests (e.g., Camera).
+     * @param requestCode The request code passed in requestPermissions().
+     * @param permissions The requested permissions.
+     * @param grantResults The grant results for the corresponding permissions.
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
     {
@@ -290,34 +367,60 @@ public class main_screen extends MasterActivity
         }
     }
 
+    /**
+     * UI callback to view search history.
+     * @param view The view that was clicked.
+     */
     public void searchHistory(View view)
     {
         Intent intent = new Intent(this, search_history_screen.class);
         startActivity(intent);
     }
 
+    /**
+     * UI callback to view favorite items.
+     * @param view The view that was clicked.
+     */
     public void favorites(View view)
     {
         Intent intent = new Intent(this,saved_items_screen.class);
         startActivity(intent);
     }
+
+    /**
+     * UI callback to view all history records.
+     * @param view The view that was clicked.
+     */
     public void allHistory(View view)
     {
         Intent intent = new Intent(this,show_all_history_screen.class);
         startActivity(intent);
     }
+
+    /**
+     * UI callback to navigate to the settings screen.
+     * @param view The view that was clicked.
+     */
     public void goToSettings(View view)
     {
         Intent intent = new Intent(this, settings_screen.class);
         startActivity(intent);
     }
 
+    /**
+     * UI callback to view the credits screen.
+     * @param view The view that was clicked.
+     */
     public void credits(View view)
     {
         Intent intent = new Intent(this, credits_screen.class);
         startActivity(intent);
     }
 
+    /**
+     * UI callback to view the "How to Search" screen.
+     * @param view The view that was clicked.
+     */
     public void howToSearch(View view)
     {
         Intent intent = new Intent(this, how_to_search_screen.class);

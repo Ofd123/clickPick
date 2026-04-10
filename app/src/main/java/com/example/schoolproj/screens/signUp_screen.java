@@ -31,13 +31,29 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
 
+/**
+ * Activity for new user registration (Sign Up).
+ * Handles user creation using Firebase Authentication, manages "Remember Me" preferences,
+ * and enforces acceptance of the Terms of Service.
+ */
 public class signUp_screen extends MasterActivity
 {
+    /** Editable fields for user name, email, and password. */
     EditText nameED, emailED, passwordED;
+    /** Current values of registration fields. */
     String userName, email, password;
+    /** Checkboxes for persisting the session and accepting terms. */
     CheckBox rememberMeCB, cbTermsOfService;
+    /** Link to open the Terms of Service dialog. */
     TextView tvTermsOfServiceLink;
 
+    /**
+     * Called when the activity is starting.
+     * Initializes UI components and sets up listeners for the Terms of Service link.
+     * @param savedInstanceState If the activity is being re-initialized after
+     *                           previously being shut down then this Bundle contains the data it most
+     *                           recently supplied in onSaveInstanceState(Bundle).
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -50,9 +66,18 @@ public class signUp_screen extends MasterActivity
         emailED = findViewById(R.id.emailED);
         passwordED = findViewById(R.id.passwordED);
 
-        tvTermsOfServiceLink.setOnClickListener(v -> showTermsOfServiceDialog());
+        tvTermsOfServiceLink.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showTermsOfServiceDialog();
+            }
+        });
     }
 
+    /**
+     * Displays an AlertDialog containing the app's Terms of Service.
+     * Provides 'Accept' and 'Decline' options that update the Terms checkbox.
+     */
     private void showTermsOfServiceDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View dialogView = getLayoutInflater().inflate(R.layout.terms_of_service_dialog, null);
@@ -63,19 +88,29 @@ public class signUp_screen extends MasterActivity
         View btnAccept = dialogView.findViewById(R.id.btnAccept);
         View btnDecline = dialogView.findViewById(R.id.btnDecline);
 
-        btnAccept.setOnClickListener(v -> {
-            cbTermsOfService.setChecked(true);
-            dialog.dismiss();
+        btnAccept.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cbTermsOfService.setChecked(true);
+                dialog.dismiss();
+            }
         });
 
-        btnDecline.setOnClickListener(v -> {
-            cbTermsOfService.setChecked(false);
-            dialog.dismiss();
+        btnDecline.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cbTermsOfService.setChecked(false);
+                dialog.dismiss();
+            }
         });
 
         dialog.show();
     }
 
+    /**
+     * Performs the actual user creation in Firebase Authentication.
+     * Displays a progress dialog, manages session state, and persists user info if "Remember Me" is checked.
+     */
     public void connect()
     {
         ProgressDialog progressDialog = new ProgressDialog(signUp_screen.this);
@@ -145,6 +180,11 @@ public class signUp_screen extends MasterActivity
 
     }
 
+    /**
+     * UI callback to start the sign-up process.
+     * Validates that all fields are filled and the Terms of Service are accepted.
+     * @param view The view that was clicked (Sign Up button).
+     */
     public void signUp(View view)
     {
         //the user would agree to the terms of service once signin in
@@ -165,7 +205,10 @@ public class signUp_screen extends MasterActivity
         connect();
     }
 
-
+    /**
+     * Switches the user state to Log In and returns to the calling activity.
+     * @param view The view that was clicked (Log In link/button).
+     */
     public void logIn(View view)
     {
         Intent resultIntent = new Intent();
@@ -173,6 +216,4 @@ public class signUp_screen extends MasterActivity
         setResult(Activity.RESULT_OK, resultIntent);
         finish();
     }
-
-
 }

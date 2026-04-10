@@ -48,6 +48,7 @@
             android:exported="false" />
         <activity
             android:name=".screens.search_screen"
+            android:hardwareAccelerated="false"
             android:exported="false" />
         <activity
             android:name=".screens.main_screen"

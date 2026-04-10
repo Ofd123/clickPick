@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -34,14 +35,31 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * Activity for configuring and executing product searches.
+ * Allows users to define search parameters (attributes/settings), performs a web search via Exa,
+ * and extracts structured product data using Gemini AI.
+ * Results are automatically saved to the user's search history in Firebase.
+ */
 public class search_screen extends MasterActivity
 {
-
+    /** RecyclerView for displaying and editing search parameters. */
     RecyclerView recyclerView;
+    /** Adapter for managing the search parameter list items. */
     RecycleViewAdapter adapter;
+    /** List of search parameters (attributes and their values) defined by the user. */
     List<SearchItemParameter> searchParameters;
+    /** List of product results extracted from the search. */
     ArrayList<Product> results;
 
+    /**
+     * Called when the activity is starting.
+     * Initializes UI components, parses incoming search details (if any),
+     * and sets up the recycler view for search parameters.
+     * @param savedInstanceState If the activity is being re-initialized after
+     *                           previously being shut down then this Bundle contains the data it most
+     *                           recently supplied in onSaveInstanceState(Bundle).
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -81,14 +99,21 @@ public class search_screen extends MasterActivity
         }
 
         adapter = new RecycleViewAdapter(searchParameters);
-        adapter.setOnParameterChangedListener(this::updateAddButtonVisibility);
+        adapter.setOnParameterChangedListener(new RecycleViewAdapter.OnParameterChangedListener() {
+            @Override
+            public void onParameterUpdated() {
+                updateAddButtonVisibility();
+            }
+        });
         recyclerView.setAdapter(adapter);
 
         updateAddButtonVisibility();
     }
 
-    // -----------------------------------------------------------------------------------------
-
+    /**
+     * Parses initial search details from a JSON string (typically from image analysis).
+     * @param json The JSON string containing 'item' and 'settings' keys.
+     */
     private void parseInitialSearchDetails(String json)
     {
         try
@@ -119,8 +144,11 @@ public class search_screen extends MasterActivity
         }
     }
 
-    // -----------------------------------------------------------------------------------------
-
+    /**
+     * Parses the JSON response from Gemini AI into a list of Product objects.
+     * Handles both raw arrays and nested "products" arrays.
+     * @param response The raw JSON string from Gemini.
+     */
     private void parseGeminiResponse(String response)
     {
         try
@@ -188,6 +216,12 @@ public class search_screen extends MasterActivity
         }
     }
 
+    /**
+     * Safely retrieves a string from a JSONObject, handling nulls and trimming values.
+     * @param obj Target JSONObject.
+     * @param key Key to retrieve.
+     * @return The trimmed string, or null if key missing/invalid.
+     */
     private String getSafeString(JSONObject obj, String key)
     {
         if (!obj.has(key) || obj.isNull(key)) return null;
@@ -200,8 +234,14 @@ public class search_screen extends MasterActivity
         return value;
     }
 
-    // -----------------------------------------------------------------------------------------
-
+    /**
+     * Initiates the multi-step search pipeline:
+     * 1. Constructs a web search query from user parameters.
+     * 2. Performs a web search using Exa.
+     * 3. Scrapes and cleans content from search results.
+     * 4. Sends content to Gemini for product extraction.
+     * @param view The view that was clicked (Search button).
+     */
     public void startSearch(View view)
     {
         StringBuilder queryBuilder = new StringBuilder();
@@ -228,7 +268,9 @@ public class search_screen extends MasterActivity
         pd.show();
 
         String finalQuery = query;
-        new Thread(() -> {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
             try
             {
                 Log.d(TAG, "Starting search for: " + finalQuery);
@@ -243,9 +285,16 @@ public class search_screen extends MasterActivity
 
                 for (String url : urls)
                 {
-                    if (keptCount >= 5) break;
+                    if (keptCount >= 5) {
+                        break;
+                    }
 
-                    runOnUiThread(() -> pd.setMessage("Reading from " + url + "..."));
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            pd.setMessage("Reading from " + url + "...");
+                        }
+                    });
 
                     String raw = ExaManager.getInstance().getContents(url);
                     if (raw == null || raw.isEmpty()) continue;
@@ -275,7 +324,12 @@ public class search_screen extends MasterActivity
                     throw new Exception("Could not extract valid product data from the found pages.");
                 }
 
-                runOnUiThread(() -> pd.setMessage("Extracting products..."));
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        pd.setMessage("Extracting products...");
+                    }
+                });
 
                 String msg = SEARCH_PROMPT  + text.toString();
 
@@ -284,26 +338,81 @@ public class search_screen extends MasterActivity
                     @Override
                     public void onSuccess(String result)
                     {
-                        runOnUiThread(() -> {
-                            pd.dismiss();
-                            parseGeminiResponse(result);
+                        Log.d(TAG, "========== GEMINI RAW RESPONSE ==========");
+                        Log.d(TAG, result);
+                        Log.d(TAG, "=========================================");
 
-                            if (!results.isEmpty())
-                                finalizeSearch(finalQuery);
-                            else
-                                Toast.makeText(search_screen.this,
-                                        "No products could be parsed from the search results.", Toast.LENGTH_SHORT).show();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                pd.dismiss();
+
+                                if (result == null || result.trim().isEmpty())
+                                {
+                                    Toast.makeText(search_screen.this,"Empty response from AI", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+                                if (result.contains("\"error\":503"))
+                                {
+                                    Toast.makeText(search_screen.this,"AI is currently busy (server overloaded). Try again shortly.", Toast.LENGTH_LONG).show();
+                                    return;
+                                }
+
+                                String clean = result.trim()
+                                        .replaceAll("```json\\s*", "")
+                                        .replaceAll("```\\s*", "")
+                                        .trim();
+
+                                if (clean.contains("\"error\"") || clean.contains("UNAVAILABLE"))
+                                {
+                                    Log.e(TAG, "Gemini returned error: " + clean);
+
+                                    Toast.makeText(search_screen.this, "AI is currently busy (server overloaded). Try again shortly.", Toast.LENGTH_LONG).show();
+                                    return;
+                                }
+
+                                if (!clean.startsWith("[") && !clean.startsWith("{"))
+                                {
+                                    Log.e(TAG, "Invalid Gemini format: " + clean);
+
+                                    Toast.makeText(search_screen.this,
+                                            "Unexpected AI response format.",
+                                            Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+
+                                parseGeminiResponse(clean);
+
+                                if (!results.isEmpty())
+                                {
+                                    finalizeSearch(finalQuery);
+                                }
+                                else
+                                {
+                                    Toast.makeText(search_screen.this,
+                                            "No valid products found.",
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                            }
                         });
                     }
 
                     @Override
                     public void onFailure(Throwable error)
                     {
-                        runOnUiThread(() -> {
-                            pd.dismiss();
-                            Toast.makeText(search_screen.this,
-                                    "Gemini Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "========== GEMINI FAILURE ==========", error);
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                pd.dismiss();
+
+                                {
+                                    Toast.makeText(search_screen.this, "Gemini failed: " + error.getMessage(), Toast.LENGTH_LONG).show();
+                                }
+                            }
                         });
+                        return;
                     }
                 });
 
@@ -311,25 +420,34 @@ public class search_screen extends MasterActivity
             catch (Exception e)
             {
                 Log.e(TAG, "Search Pipeline Error", e);
-                runOnUiThread(() -> {
-                    pd.dismiss();
-                    Toast.makeText(search_screen.this,
-                            e.getMessage(),
-                            Toast.LENGTH_LONG).show();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        pd.dismiss();
+                        Toast.makeText(search_screen.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                    }
                 });
             }
+        }
         }).start();
     }
 
-    // -----------------------------------------------------------------------------------------
-
+    /**
+     * Finalizes the search by saving the results to history in Firebase and transitioning to the results screen.
+     * @param query The final search query string used.
+     */
     private void finalizeSearch(String query) {
 
         SearchDetails search = new SearchDetails(query, results);
 
         // Ensure we have the latest UID directly from Firebase Auth
         com.google.firebase.auth.FirebaseUser fbUser = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
-        String uid = (fbUser != null) ? fbUser.getUid() : (connected_user != null ? connected_user.getUserID() : null);
+        String uid = null;
+        if (fbUser != null) {
+            uid = fbUser.getUid();
+        } else if (connected_user != null) {
+            uid = connected_user.getUserID();
+        }
 
         if (uid != null)
         {
@@ -343,8 +461,18 @@ public class search_screen extends MasterActivity
             Log.d(TAG, "UID: " + uid);
 
             newSearchRef.setValue(search)
-                    .addOnSuccessListener(aVoid -> Log.d(TAG, "Search history uploaded successfully to: " + newSearchRef.toString()))
-                    .addOnFailureListener(e -> Log.e(TAG, "Search history upload failed: " + e.getMessage()));
+                    .addOnSuccessListener(new com.google.android.gms.tasks.OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d(TAG, "Search history uploaded successfully to: " + newSearchRef.toString());
+                        }
+                    })
+                    .addOnFailureListener(new com.google.android.gms.tasks.OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.e(TAG, "Search history upload failed: " + e.getMessage());
+                        }
+                    });
         }
         else
         {
@@ -358,10 +486,19 @@ public class search_screen extends MasterActivity
         finish();
     }
 
+    /**
+     * UI callback for the back button to close the activity.
+     * @param view The view that was clicked.
+     */
     public void back(View view) {
         finish();
     }
 
+    /**
+     * UI callback to add a new search parameter attribute card.
+     * Limits the total number of parameters to 8.
+     * @param view The view that was clicked (Add button).
+     */
     public void addItem(View view) {
         if (searchParameters.size() >= 8) {
             Toast.makeText(this, "Maximum 8 attributes allowed", Toast.LENGTH_SHORT).show();
@@ -371,9 +508,18 @@ public class search_screen extends MasterActivity
         adapter.notifyItemInserted(searchParameters.size() - 1);
         updateAddButtonVisibility();
 
-        recyclerView.post(() -> recyclerView.smoothScrollToPosition(searchParameters.size() - 1));
+        recyclerView.post(new Runnable() {
+            @Override
+            public void run() {
+                recyclerView.smoothScrollToPosition(searchParameters.size() - 1);
+            }
+        });
     }
 
+    /**
+     * Updates the visibility of "Add" buttons based on whether the last parameter is correctly filled.
+     * Enforces a consistency rule where parameters must be completed before adding new ones.
+     */
     private void updateAddButtonVisibility() {
         if (searchParameters == null || searchParameters.isEmpty()) return;
 
@@ -387,7 +533,12 @@ public class search_screen extends MasterActivity
         }
 
         boolean canAdd = lastFilled && searchParameters.size() < 8;
-        int visibility = canAdd ? View.VISIBLE : View.GONE;
+        int visibility;
+        if (canAdd) {
+            visibility = View.VISIBLE;
+        } else {
+            visibility = View.GONE;
+        }
 
         View btnCard = findViewById(R.id.btnAddAttributeCard);
         View btnBottom = findViewById(R.id.btnAddItemBottom);
@@ -396,7 +547,13 @@ public class search_screen extends MasterActivity
         if (btnBottom != null) btnBottom.setVisibility(visibility);
     }
 
-    public void searchBtn(View view) {
+    /**
+     * UI callback for the secondary search button.
+     * Proxies the request to startSearch.
+     * @param view The view that was clicked.
+     */
+    public void searchBtn(View view)
+    {
         startSearch(view);
     }
 }

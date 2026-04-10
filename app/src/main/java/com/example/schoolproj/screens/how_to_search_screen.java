@@ -15,8 +15,19 @@ import android.view.View;
 import android.widget.Button;
 import androidx.appcompat.widget.Toolbar;
 
+/**
+ * Activity that provides instructions on how to use the search functionality.
+ * Includes layout setup and navigation handling.
+ */
 public class how_to_search_screen extends AppCompatActivity {
 
+    /**
+     * Called when the activity is starting.
+     * Initializes the view, handles the back button dispatcher, and sets up the back button listener.
+     * @param savedInstanceState If the activity is being re-initialized after
+     *                           previously being shut down then this Bundle contains the data it most
+     *                           recently supplied in onSaveInstanceState(Bundle).
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,6 +57,10 @@ public class how_to_search_screen extends AppCompatActivity {
         });
     }
 
+    /**
+     * UI callback for the back button to close the activity.
+     * @param view The view that was clicked.
+     */
     public void back(View view)
     {
         finish();

@@ -13,6 +13,10 @@ import java.util.List;
 
 import okhttp3.*;
 
+/**
+ * Singleton manager class for interacting with the Exa.ai API.
+ * Provides functionality for searching and retrieving web contents.
+ */
 public class ExaManager
 {
 
@@ -22,6 +26,9 @@ public class ExaManager
     private static ExaManager instance;
     private OkHttpClient client;
 
+    /**
+     * Private constructor to initialize the OkHttpClient with custom timeouts.
+     */
     private ExaManager()
     {
         client = new OkHttpClient.Builder()
@@ -31,6 +38,10 @@ public class ExaManager
                 .build();
     }
 
+    /**
+     * Returns the singleton instance of ExaManager.
+     * @return The singleton instance.
+     */
     public static synchronized ExaManager getInstance()
     {
         if (instance == null)
@@ -40,6 +51,12 @@ public class ExaManager
         return instance;
     }
 
+    /**
+     * Performs a web search using the Exa.ai search endpoint.
+     * @param queryInput The search query string.
+     * @return A list of URLs matching the search query.
+     * @throws Exception If the API request fails or response parsing fails.
+     */
     public List<String> search(String queryInput) throws Exception
     {
         // Escape quotes
@@ -81,6 +98,12 @@ public class ExaManager
         }
     }
 
+    /**
+     * Retrieves the text contents of a single URL using Exa.ai's contents endpoint.
+     * @param url The URL to retrieve contents from.
+     * @return The extracted text content, up to 8000 characters.
+     * @throws Exception If the API request fails or response parsing fails.
+     */
     public String getContents(String url) throws Exception
     {
         String jsonBody = "{\n" +
@@ -115,6 +138,12 @@ public class ExaManager
         }
     }
 
+    /**
+     * Retrieves the text contents for multiple URLs using Exa.ai's contents endpoint.
+     * @param urlsArray A JSONArray of URLs to retrieve contents from.
+     * @return A JSONArray containing the results from the API.
+     * @throws Exception If the API request fails or response parsing fails.
+     */
     public JSONArray getContents(JSONArray urlsArray) throws Exception
     {
         StringBuilder urlsBuilder = new StringBuilder("[");
@@ -152,4 +181,4 @@ public class ExaManager
             return json.getJSONArray("results");
         }
     }
-}
+}
