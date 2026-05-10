@@ -32,9 +32,9 @@ public class ExaManager
     private ExaManager()
     {
         client = new OkHttpClient.Builder()
-                .connectTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
-                .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
-                .writeTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+                .connectTimeout(60, java.util.concurrent.TimeUnit.SECONDS) // timeout for connecting to the server
+                .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS)    //timeout for reading data from the server
+                .writeTimeout(60, java.util.concurrent.TimeUnit.SECONDS)   // timeout for writing data to the server
                 .build();
     }
 
@@ -59,7 +59,7 @@ public class ExaManager
      */
     public List<String> search(String queryInput) throws Exception
     {
-        // Escape quotes
+        // to escape quotes
         String query = queryInput.replace("\"", "\\\"");
 
         String jsonBody = "{\n" +
@@ -76,7 +76,7 @@ public class ExaManager
         Request request = new Request.Builder()
                 .url(SEARCH_URL)
                 .addHeader("x-api-key", API_KEY)
-                .addHeader("Content-Type", "application/json")
+                .addHeader("Content-Type", "application/json") // set the content type to JSON
                 .post(body)
                 .build();
 
@@ -88,6 +88,7 @@ public class ExaManager
             String responseBody = response.body().string();
             Log.d("EXA_RESPONSE", responseBody);
 
+            // Parse the JSON response
             JSONObject json = new JSONObject(responseBody);
             JSONArray results = json.getJSONArray("results");
             List<String> urls = new ArrayList<>();
@@ -181,4 +182,4 @@ public class ExaManager
             return json.getJSONArray("results");
         }
     }
-}
+}

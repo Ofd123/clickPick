@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="#F4F6F8"
     android:orientation="vertical"
-    android:padding="24dp"
+    android:padding="20dp"
     tools:context=".screens.signUp_screen">
 
     <TextView
@@ -45,28 +45,6 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="6dp"
-                android:text="Username"
-                android:textColor="#4B5563"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-
-            <EditText
-                android:id="@+id/nameED"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:background="#F3F4F6"
-                android:hint="Greg"
-                android:inputType="text"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:textColor="#000000"
-                android:textColorHint="#9CA3AF"
-                android:textSize="14sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="6dp"
                 android:text="Email Address"
@@ -85,7 +63,8 @@
                 android:paddingEnd="16dp"
                 android:textColor="#000000"
                 android:textColorHint="#9CA3AF"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                tools:ignore="VisualLintTextFieldSize" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -108,7 +87,8 @@
                 android:paddingEnd="16dp"
                 android:textColor="#000000"
                 android:textColorHint="#9CA3AF"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                tools:ignore="VisualLintTextFieldSize" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -164,7 +144,8 @@
                 android:text="Sign Up →"
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                tools:ignore="VisualLintButtonSize" />
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>
@@ -191,12 +172,10 @@
             android:text="Log In"
             android:textColor="#0E5B8E"
             android:textSize="14sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            tools:ignore="TouchTargetSizeCheck" />
     </LinearLayout>
 
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+
 
 </LinearLayout>

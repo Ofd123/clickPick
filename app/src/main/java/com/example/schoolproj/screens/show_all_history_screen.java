@@ -180,13 +180,13 @@ public class show_all_history_screen extends MasterActivity implements AdapterVi
                 tvSearchQuery.setText(currentSearch.getSearch_query());
                 
                 String dateStr = dateFormat.format(new Date(currentSearch.getSearch_date()));
-                
-                String type;
-                if (currentSearch.getCompare_price() != null && currentSearch.getCompare_price()) {
-                    type = "Comparison";
-                } else {
-                    type = "Keyword";
-                }
+
+                String type = "Keyword"; //at the moment, the user can both compare and search for products depending on his search
+//                if (currentSearch.getCompare_price() != null && currentSearch.getCompare_price()) {
+//                    type = "Comparison";
+//                } else {
+//                    type = "Keyword";
+//                }
                 
                 tvSearchDetails.setText(dateStr + " • " + type);
             }

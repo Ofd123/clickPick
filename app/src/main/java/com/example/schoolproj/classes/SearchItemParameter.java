@@ -42,16 +42,16 @@ public class SearchItemParameter implements Serializable
         this.isEditable = false;
     }
 
-    /**
-     * Constructor for creating an empty parameter with a specific editability.
-     * @param isEditable Whether the parameter is editable.
-     */
-    public SearchItemParameter(Boolean isEditable)
-    {
-        this.Attribute = "";
-        this.setting = "";
-        this.isEditable = isEditable;
-    }
+//    /**
+//     * Constructor for creating an empty parameter with a specific editability.
+//     * @param isEditable Whether the parameter is editable.
+//     */
+//    public SearchItemParameter(Boolean isEditable)
+//    {
+//        this.Attribute = "";
+//        this.setting = "";
+//        this.isEditable = isEditable;
+//    }
 
     /** @return True if the parameter is editable. */
     public Boolean getEditable()
@@ -88,13 +88,13 @@ public class SearchItemParameter implements Serializable
         this.setting = setting;
     }
 
-    /**
-     * Returns a string representation of the parameter.
-     * @return A string in "Attribute: setting" format.
-     */
-    @NonNull
-    @Override
-    public String toString() {
-        return Attribute + ": " + setting;
-    }
+//    /**
+//     * Returns a string representation of the parameter.
+//     * @return A string in "Attribute: setting" format.
+//     */
+//    @NonNull
+//    @Override
+//    public String toString() {
+//        return Attribute + ": " + setting;
+//    }
 }

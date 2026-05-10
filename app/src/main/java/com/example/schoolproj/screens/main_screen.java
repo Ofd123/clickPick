@@ -335,6 +335,7 @@ public class main_screen extends MasterActivity
                 public void onFailure(Throwable error)
                 {
                     pd.dismiss();
+                    Toast.makeText(main_screen.this, "Analyze Error, please try again later", Toast.LENGTH_SHORT).show();
                     Log.e(TAG, "analyzeImage failure: " + error.getMessage());
                 }
             });

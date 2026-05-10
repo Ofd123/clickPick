@@ -29,10 +29,7 @@ import com.google.firebase.auth.FirebaseUser;
  * sessions.
  */
 public class login_screen extends MasterActivity {
-    /** Intent that started this activity. */
-    Intent loginIntent;
-    /** Current credentials entered by the user. */
-    String userName, password;
+
     /** UI elements for user input. */
     EditText emailED, passwordED;
     /** Checkbox for persisting the session. */
@@ -51,7 +48,7 @@ public class login_screen extends MasterActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_screen);
-        loginIntent = getIntent();
+        Intent loginIntent = getIntent();
 
         emailED = findViewById(R.id.emailED);
         passwordED = findViewById(R.id.passwordED);
@@ -70,8 +67,22 @@ public class login_screen extends MasterActivity {
         String email = emailED.getText().toString().trim();
         String password = passwordED.getText().toString().trim();
 
-        if (email.isEmpty() || password.isEmpty()) {
-            Toast.makeText(this, "Please fill all the fields", Toast.LENGTH_SHORT).show();
+        boolean isValid = true;
+        if (email.isEmpty())
+        {
+            emailED.setError("Email is required.");
+            isValid = false;
+        }
+
+        if (password.isEmpty() || password.length() < 6)
+        {
+            passwordED.setError("Password is required.");
+            isValid = false;
+        }
+
+
+
+        if (!isValid) {
             return;
         }
 

@@ -1,5 +1,6 @@
 package com.example.schoolproj.screens;
 
+import static androidx.core.content.ContextCompat.startActivity;
 import static com.example.schoolproj.FireBaseFiles.FBRef.favoritesRef;
 import static com.example.schoolproj.FireBaseFiles.FBRef.refAuth;
 

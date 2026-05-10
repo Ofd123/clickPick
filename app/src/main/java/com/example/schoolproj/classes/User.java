@@ -26,19 +26,6 @@ public class User {
     }
 
     /**
-     * Constructor specifically for setting a username.
-     * Initializes creation and last login dates to the current system time.
-     * @param username The user's chosen display name.
-     */
-    public User(String username)
-    {
-        this.username = username;
-        // 2. Set current local time in milliseconds
-        this.creationDate = System.currentTimeMillis();
-        this.lastLogin = System.currentTimeMillis();
-    }
-
-    /**
      * Constructor for a full user profile.
      * @param userID Unique user ID.
      * @param username Display name.
@@ -51,15 +38,7 @@ public class User {
         this.lastLogin = System.currentTimeMillis();
     }
 
-    /**
-     * Returns a special map representing the Firebase server timestamp.
-     * Use this when writing to the database to ensure synchronization with server time.
-     * @return A map compatible with ServerValue.TIMESTAMP.
-     */
-    public static Map<String, String> getFirebaseTimestamp()
-    {
-        return ServerValue.TIMESTAMP;
-    }
+
 
     /** @param lastLogin The new last login timestamp. */
     public void setLastLogin(long lastLogin)

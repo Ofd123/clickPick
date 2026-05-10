@@ -79,15 +79,6 @@
                     android:textSize="12sp"
                     android:textStyle="bold" />
 
-                <TextView
-                    android:id="@+id/forgotPasswordText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:text="Forgot password?"
-                    android:textColor="#0E5B8E"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
             </RelativeLayout>
 
             <EditText

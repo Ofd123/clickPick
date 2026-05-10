@@ -18,14 +18,13 @@ public class SearchDetails
     private String search_id;
     /** Timestamp when the search was performed. */
     private Long search_date;
-    /** Timestamp when the search record should be deleted (e.g., after 2 weeks). */
-    private Long delete_date;
+//    private Long delete_date;
     /** The search query string entered by the user. */
     private String search_query;
     /** List of products found as a result of the search. */
     private List<Product> search_result;
     /** Boolean flag indicating if this was a price comparison search. */
-    private Boolean compare_price;
+//    private Boolean compare_price;
 
     /**
      * Default constructor required for Firebase Realtime Database.
@@ -35,7 +34,7 @@ public class SearchDetails
     {
         // Default constructor required for calls to DataSnapshot.getValue(SearchDetails.class)
         this.search_date = System.currentTimeMillis();
-        this.delete_date = this.search_date + (14L * 24 * 60 * 60 * 1000); // 2 weeks
+//        this.delete_date = this.search_date + (14L * 24 * 60 * 60 * 1000); // 2 weeks
     }
 
     /**
@@ -54,13 +53,13 @@ public class SearchDetails
      * Constructor for a search with price comparison option.
      * @param search_query The query string.
      * @param search_result The list of results.
-     * @param compare_price True if price comparison was enabled.
+     *
      */
-    public SearchDetails(String search_query, List<Product> search_result, boolean compare_price)
-    {
-        this(search_query, search_result);
-        this.compare_price = compare_price;
-    }
+//    public SearchDetails(String search_query, List<Product> search_result, boolean compare_price)
+//    {
+//        this(search_query, search_result);
+////        this.compare_price = compare_price;
+//    }
 
     /** @return The search ID. */
     public String getSearch_id()
@@ -85,17 +84,14 @@ public class SearchDetails
     {
         this.search_date = search_date;
     }
+//    public Long getDelete_date()
+//    {
+//        return delete_date;
+//    }
 
-    /** @return The deletion date timestamp. */
-    public Long getDelete_date()
-    {
-        return delete_date;
-    }
-
-    /** @param delete_date The new deletion date timestamp. */
-    public void setDelete_date(Long delete_date) {
-        this.delete_date = delete_date;
-    }
+//    public void setDelete_date(Long delete_date) {
+//        this.delete_date = delete_date;
+//    }
 
     /** @return The search query string. */
     public String getSearch_query() {
@@ -117,29 +113,27 @@ public class SearchDetails
         this.search_result = search_result;
     }
 
-    /** @return True if this search was for price comparison. */
-    public Boolean getCompare_price() {
-        return compare_price;
-    }
+//    public Boolean getCompare_price() {
+//        return compare_price;
+//    }
 
-    /** @param compare_price The new compare price status. */
-    public void setCompare_price(Boolean compare_price) {
-        this.compare_price = compare_price;
-    }
+//    public void setCompare_price(Boolean compare_price) {
+//        this.compare_price = compare_price;
+//    }
 
-    /**
-     * Converts the SearchDetails object into a Map for Firebase updates.
-     * @return A map containing the object fields.
-     */
-    @Exclude
-    public Map<String, Object> toMap() {
-        HashMap<String, Object> result = new HashMap<>();
-        result.put("search_id", search_id);
-        result.put("search_date", search_date);
-        result.put("delete_date", delete_date);
-        result.put("search_query", search_query);
-        result.put("search_result", search_result);
-        result.put("compare_price", compare_price);
-        return result;
-    }
+//    /**
+//     * Converts the SearchDetails object into a Map for Firebase updates.
+//     * @return A map containing the object fields.
+//     */
+//    @Exclude
+//    public Map<String, Object> toMap() {
+//        HashMap<String, Object> result = new HashMap<>();
+//        result.put("search_id", search_id);
+//        result.put("search_date", search_date);
+//        result.put("delete_date", delete_date);
+//        result.put("search_query", search_query);
+//        result.put("search_result", search_result);
+//        result.put("compare_price", compare_price);
+//        return result;
+//    }
 }

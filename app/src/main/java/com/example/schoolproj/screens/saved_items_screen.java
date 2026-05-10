@@ -117,7 +117,18 @@ public class saved_items_screen extends MasterActivity implements AdapterView.On
         {
             Product p = savedProducts.get(i);
             names[i] = p.getProduct_name();
-            prices[i] = String.valueOf(p.getPrice());
+            if(p.getPrice() == null)
+            {
+                prices[i] = "Price unavailable";
+            }
+            else if (!(p.getPrice() > 0))
+            {
+                prices[i] = "Store page";
+            }
+            else
+            {
+                prices[i] = String.format("%.2f", p.getPrice()) + "$";
+            }
             companies[i] = p.getStore_name();
             if(p.getImageUrl() != null && !p.getImageUrl().isEmpty() && !p.getImageUrl().equals("null"))
             {
